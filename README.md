@@ -1,7 +1,5 @@
 # Tree-Climber
 
-# A __Tree Climber__
-
 __Group #4__
 
 __Group Members:__
