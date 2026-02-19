@@ -1,2 +1,15 @@
 # Tree-Climber
-This is a repository for new Davidson webtree assist software.
+
+#A __Tree Climber__
+
+__Group #4__
+
+__Group Members:__
+
+- Lars Oehler - Developer and Product Owner
+
+- Madeline Shi - Developer
+
+- Ross Hope - Developer and Scrum Master
+
+- Samantha Galvan - Developer
