@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Course Schedule Builder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero__badge">CSC Schedule Builder</div>
+        <h1>Pick courses. See schedules.</h1>
+        <p>
+          Enter a CRN, course title, or course section (e.g. <span>CSC-221</span> or
+          <span>CSC-221-A</span>). Add multiple selections to explore possible 4-course schedules.
+        </p>
+      </header>
+
+      <section class="panel">
+        <div class="panel__left">
+          <label for="course-input">Add a course</label>
+          <div class="input-row">
+            <input
+              id="course-input"
+              list="course-suggestions"
+              placeholder="CRN, title, or course section"
+              autocomplete="off"
+            />
+            <button id="add">Add</button>
+          </div>
+          <datalist id="course-suggestions"></datalist>
+          <div class="panel__actions">
+            <button id="build">Build schedules</button>
+            <label class="toggle">
+              <input type="checkbox" id="show-conflicts" />
+              <span>Show conflicting schedules too</span>
+            </label>
+          </div>
+          <div id="status" class="status"></div>
+          <div class="selections">
+            <h2>Selections</h2>
+            <div id="selection-list" class="selection-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="results">
+        <div class="results__header">
+          <h2>Schedules</h2>
+          <div class="schedule-controls">
+            <label for="schedule-select">Preview schedule</label>
+            <select id="schedule-select"></select>
+          </div>
+          <div id="summary" class="summary"></div>
+        </div>
+        <div class="calendar">
+          <div class="calendar__times" id="calendar-times"></div>
+          <div class="calendar__grid" id="calendar-grid"></div>
+        </div>
+        <div id="schedules" class="schedules"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
