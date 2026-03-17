@@ -1,12 +1,28 @@
 :root {
-  --ink: #1b1b1b;
-  --muted: #5a5a5a;
-  --bg: #f4f1ec;
+  --ink: #111111;
+  --muted: #5f5a55;
+  --bg: #f7f4ef;
   --card: #ffffff;
-  --accent: #2a5c8a;
-  --accent-2: #d97a2b;
-  --border: #e1d9cf;
-  --shadow: 0 18px 35px rgba(27, 27, 27, 0.12);
+
+  /* Davidson-inspired colors */
+  --accent: #c8102e;
+  --accent-hover: #a30d25;
+  --accent-2: #8a1538;
+  --focus: #7a0019;
+
+  --border: #ddd3c7;
+  --surface: #f9f6f1;
+  --surface-2: #f3ede4;
+
+  --event-bg: #f9d9df;
+  --event-border: #e3a8b3;
+  --event-text: #5a1120;
+
+  --conflict-bg: #fff0f2;
+  --conflict-border: #e8a8b3;
+  --conflict-text: #7a1428;
+
+  --shadow: 0 18px 35px rgba(17, 17, 17, 0.12);
 }
 
 * {
@@ -17,7 +33,7 @@ body {
   margin: 0;
   font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--ink);
-  background: radial-gradient(circle at top left, #fff5e9 0%, #f4f1ec 45%, #efe8de 100%);
+  background: radial-gradient(circle at top left, #fff8f8 0%, #f7f4ef 45%, #efe7dc 100%);
 }
 
 .page {
@@ -34,7 +50,7 @@ body {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
-  background: #1b1b1b;
+  background: var(--accent);
   color: #fff;
   font-size: 12px;
   letter-spacing: 0.08em;
@@ -83,7 +99,16 @@ select {
   padding: 10px 12px;
   font-size: 14px;
   font-family: inherit;
-  background: #faf8f4;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(200, 16, 46, 0.18);
+  outline-offset: 2px;
+  border-color: var(--accent);
 }
 
 .input-row {
@@ -105,7 +130,8 @@ textarea {
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
-  background: #faf8f4;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .panel__actions {
@@ -124,11 +150,18 @@ button {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(42, 92, 138, 0.25);
+  box-shadow: 0 6px 16px rgba(200, 16, 46, 0.25);
+  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
 }
 
 button:hover {
-  background: #1f4b72;
+  background: #e0193b;
+}
+
+button:focus-visible {
+  background: #a30d25;
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(200, 16, 46, 0.35);
 }
 
 .toggle {
@@ -169,13 +202,13 @@ button:hover {
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #fdf9f2;
+  background: var(--surface);
   font-size: 14px;
 }
 
 .selection-item.drag-over {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(42, 92, 138, 0.18);
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.16);
 }
 
 .selection-item span {
@@ -192,17 +225,34 @@ button:hover {
 
 .pill {
   border: 1px solid var(--border);
-  background: #fff;
+  background: #ffffff;
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
   cursor: pointer;
+  color: var(--ink);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
+/* SHOW button hover */
+.pill:hover {
+  border-color: var(--accent);
+  background: #ffe6ea;
+  color: #7a0019;
+}
+
+/* HIDE button default (active state) */
 .pill.active {
   background: var(--accent);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--accent);
+}
+
+/* HIDE button hover */
+.pill.active:hover {
+  background: #a30d25;
+  border-color: #a30d25;
+  color: #ffffff;
 }
 
 .match-list {
@@ -253,7 +303,7 @@ button:hover {
 }
 
 .calendar__times {
-  background: #faf5ee;
+  background: var(--surface-2);
   border-right: 1px solid var(--border);
   padding: 12px 8px;
   font-size: 12px;
@@ -283,7 +333,9 @@ button:hover {
   background: #fff;
   padding: 8px 10px;
   font-size: 12px;
+  font-weight: 600;
   border-bottom: 1px solid var(--border);
+  color: var(--accent-2);
 }
 
 .calendar__events {
@@ -297,11 +349,11 @@ button:hover {
   left: 6px;
   right: 6px;
   border-radius: 10px;
-  background: #e7eef6;
-  border: 1px solid #c2d5ea;
+  background: var(--event-bg);
+  border: 1px solid var(--event-border);
   padding: 6px 8px;
   font-size: 12px;
-  color: #1e3c5c;
+  color: var(--event-text);
   overflow: hidden;
 }
 
@@ -327,6 +379,7 @@ button:hover {
 
 .schedule-card h3 {
   margin: 0 0 12px;
+  color: var(--accent-2);
 }
 
 .course-row {
@@ -349,9 +402,9 @@ button:hover {
   margin-top: 10px;
   padding: 10px;
   border-radius: 12px;
-  background: #fff3e9;
-  border: 1px solid #f3c7a6;
-  color: #8f4b1a;
+  background: var(--conflict-bg);
+  border: 1px solid var(--conflict-border);
+  color: var(--conflict-text);
   font-size: 12px;
 }
 
@@ -371,4 +424,63 @@ button:hover {
   .calendar__times {
     display: none;
   }
+}
+
+.webtree {
+  margin-top: 32px;
+}
+
+.webtree-preview {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.webtree-card {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.webtree-card h3 {
+  margin: 0 0 12px;
+  color: var(--accent-2);
+}
+
+.webtree-list {
+  display: grid;
+  gap: 8px;
+}
+
+.webtree-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.webtree-slot {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.webtree-course strong {
+  display: block;
+  font-size: 14px;
+}
+
+.webtree-course span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
 }

@@ -4,12 +4,13 @@ const buildButton = document.getElementById("build");
 const schedulesEl = document.getElementById("schedules");
 const statusEl = document.getElementById("status");
 const summaryEl = document.getElementById("summary");
-const showConflictsEl = document.getElementById("show-conflicts");
 const selectionListEl = document.getElementById("selection-list");
 const scheduleSelectEl = document.getElementById("schedule-select");
 const calendarTimesEl = document.getElementById("calendar-times");
 const calendarGridEl = document.getElementById("calendar-grid");
 const suggestionsEl = document.getElementById("course-suggestions");
+const webtreePreviewEl = document.getElementById("webtree-preview");
+const webtreeSummaryEl = document.getElementById("webtree-summary");
 
 let catalog = [];
 let selections = [];
@@ -335,15 +336,14 @@ const renderSelectionList = (results) => {
 };
 
 const buildSuggestions = () => {
-  const suggestions = new Set();
+  const titleSuggestions = new Set();
+
   catalog.forEach((course) => {
-    suggestions.add(String(course.crn));
-    suggestions.add(course.courseSection);
-    suggestions.add(course.title);
+    titleSuggestions.add(course.title);
   });
 
   suggestionsEl.innerHTML = "";
-  [...suggestions]
+  [...titleSuggestions]
     .sort()
     .forEach((value) => {
       const option = document.createElement("option");
@@ -428,6 +428,107 @@ const renderCalendar = (schedule) => {
   calendarGridEl.style.height = `${height + 34}px`;
 };
 
+const getOrderedActivePreferences = () =>
+  selections
+    .filter((selection) => selection.active)
+    .map((selection) => selection.raw);
+
+const buildWebTree = (orderedPrefs) => {
+  const get = (index) => orderedPrefs[index] || "—";
+
+  return [
+    {
+      name: "Tree 1",
+      choices: [
+        { slot: 1, value: get(0), note: "Top choice" },
+        { slot: 2, value: get(1), note: "Second choice" },
+        { slot: 3, value: get(2), note: "Third choice" },
+        { slot: 4, value: get(3), note: "Backup to 3" },
+        { slot: 5, value: get(4), note: "Backup to 2" },
+        { slot: 6, value: get(2), note: "Third choice again" },
+        { slot: 7, value: get(5), note: "Backup to 6" }
+      ]
+    },
+    {
+      name: "Tree 2",
+      choices: [
+        { slot: 1, value: get(1), note: "Second choice" },
+        { slot: 2, value: get(2), note: "Third choice" },
+        { slot: 3, value: get(3), note: "Fourth choice" },
+        { slot: 4, value: get(4), note: "Backup to 3" },
+        { slot: 5, value: get(5), note: "Backup to 2" },
+        { slot: 6, value: get(3), note: "Fourth choice again" },
+        { slot: 7, value: get(6), note: "Backup to 6" }
+      ]
+    },
+    {
+      name: "Tree 3",
+      choices: [
+        { slot: 1, value: get(2), note: "Third choice" },
+        { slot: 2, value: get(3), note: "Fourth choice" },
+        { slot: 3, value: get(4), note: "Fifth choice" },
+        { slot: 4, value: get(5), note: "Backup to 3" },
+        { slot: 5, value: get(6), note: "Backup to 2" },
+        { slot: 6, value: get(4), note: "Fifth choice again" },
+        { slot: 7, value: get(7), note: "Backup to 6" }
+      ]
+    },
+    {
+      name: "Tree 4",
+      choices: Array.from({ length: 10 }, (_, index) => ({
+        slot: index + 1,
+        value: get(index),
+        note: index === 0 ? "Dream schedule anchor" : "Additional fallback"
+      }))
+    }
+  ];
+};
+
+const renderWebTree = () => {
+  const orderedPrefs = getOrderedActivePreferences();
+
+  if (orderedPrefs.length === 0) {
+    webtreePreviewEl.innerHTML = "<p>No active course preferences yet.</p>";
+    webtreeSummaryEl.textContent = "Add courses in ranked order to preview your WebTree.";
+    return;
+  }
+
+  const trees = buildWebTree(orderedPrefs);
+
+  webtreePreviewEl.innerHTML = "";
+  webtreeSummaryEl.textContent = `${orderedPrefs.length} ordered preference${
+    orderedPrefs.length === 1 ? "" : "s"
+  } mapped into Tree 1–4.`;
+
+  trees.forEach((tree) => {
+    const card = document.createElement("article");
+    card.className = "webtree-card";
+
+    const heading = document.createElement("h3");
+    heading.textContent = tree.name;
+    card.appendChild(heading);
+
+    const list = document.createElement("div");
+    list.className = "webtree-list";
+
+    tree.choices.forEach((choice) => {
+      const row = document.createElement("div");
+      row.className = "webtree-row";
+      row.innerHTML = `
+        <div class="webtree-slot">Choice ${choice.slot}</div>
+        <div class="webtree-course">
+          <strong>${choice.value}</strong>
+          <span>${choice.note}</span>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    card.appendChild(list);
+    webtreePreviewEl.appendChild(card);
+  });
+};
+
 const update = () => {
   statusEl.textContent = "";
   summaryEl.textContent = "";
@@ -442,6 +543,7 @@ const update = () => {
     calendarGridEl.innerHTML = "";
     scheduleSelectEl.innerHTML = "";
     statusEl.textContent = "Add at least one active selection to build schedules.";
+    renderWebTree();
     return;
   }
 
@@ -455,14 +557,15 @@ const update = () => {
     return;
   }
 
-  const includeConflicts = showConflictsEl.checked;
+  const includeConflicts = false;
   const { schedules, bestScore, capped } = buildRankedSchedules(results, includeConflicts);
 
   latestSchedules = schedules;
   setScheduleOptions(schedules);
   const selectedIndex = Number(scheduleSelectEl.value || 0);
   renderCalendar(schedules[selectedIndex]);
-  renderSchedules(schedules, includeConflicts);
+
+  renderWebTree();
 
   const totalSelections = results.length;
   const includedCount = bestScore ? bestScore.count : 0;
@@ -472,10 +575,48 @@ const update = () => {
   }
 };
 
+const resolveInputToTitle = (raw) => {
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+
+  const normalizedInput = normalize(trimmed);
+
+  const exactCrnMatch = catalog.find((course) => String(course.crn) === trimmed);
+  if (exactCrnMatch) return exactCrnMatch.title;
+
+  const exactSectionMatch = catalog.find(
+    (course) => normalize(course.courseSection) === normalizedInput
+  );
+  if (exactSectionMatch) return exactSectionMatch.title;
+
+  const exactTitleMatch = catalog.find(
+    (course) => normalize(course.title) === normalizedInput
+  );
+  if (exactTitleMatch) return exactTitleMatch.title;
+
+  return trimmed;
+};
+
 const addSelection = () => {
   const raw = courseInput.value.trim();
   if (!raw) return;
-  selections.push({ id: `sel-${selectionId++}`, raw, active: true });
+
+  const resolvedTitle = resolveInputToTitle(raw);
+
+  const alreadyExists = selections.some(
+    (selection) => normalize(selection.raw) === normalize(resolvedTitle)
+  );
+  if (alreadyExists) {
+    courseInput.value = "";
+    return;
+  }
+
+  selections.push({
+    id: `sel-${selectionId++}`,
+    raw: resolvedTitle,
+    active: true
+  });
+
   courseInput.value = "";
   update();
 };
@@ -492,7 +633,6 @@ const init = async () => {
   buildSuggestions();
   addButton.addEventListener("click", addSelection);
   buildButton.addEventListener("click", update);
-  showConflictsEl.addEventListener("change", update);
   scheduleSelectEl.addEventListener("change", () => {
     const index = Number(scheduleSelectEl.value || 0);
     renderCalendar(latestSchedules[index]);
