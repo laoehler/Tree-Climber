@@ -63,14 +63,25 @@ const expandDays = (days) => {
   return DAYS.filter((day) => days.includes(day));
 };
 
+const getPrimaryMeeting = (course) => {
+  return course.meetings[0];
+};
+
+const baseCourse = (courseSection) => {
+  return courseSection.split("-").slice(0, 2).join("-");
+};
+
 const conflictBetween = (courseA, courseB) => {
-  const daysA = expandDays(courseA.days);
-  const daysB = expandDays(courseB.days);
+  const mA = getPrimaryMeeting(courseA);
+  const mB = getPrimaryMeeting(courseB);
+
+  const daysA = expandDays(mA.days);
+  const daysB = expandDays(mB.days);
   const shared = daysA.filter((day) => daysB.includes(day));
   if (!shared.length) return null;
 
-  const timeA = parseTimeRange(courseA.time);
-  const timeB = parseTimeRange(courseB.time);
+  const timeA = parseTimeRange(mA.time);
+  const timeB = parseTimeRange(mB.time);
   if (!timeA || !timeB) return null;
 
   const overlaps = timeA.start < timeB.end && timeB.start < timeA.end;
@@ -89,37 +100,20 @@ const buildMatches = (selectionList) => {
     const needle = normalize(selection.raw);
     const matches = catalog.filter((course) => {
       if (isCrn) return String(course.crn) === selection.raw;
-      return (
-        normalize(course.title).includes(needle) ||
-        normalize(course.courseSection).includes(needle)
-      );
+
+      const sectionMatch =
+        normalize(course.courseSection) === needle;
+
+      const titleMatch =
+        normalize(course.title) === needle;
+
+      const fuzzyTitleMatch =
+        normalize(course.title).includes(needle);
+
+      return sectionMatch || titleMatch || fuzzyTitleMatch;
     });
     return { selection, matches };
   });
-};
-
-const createSchedules = (groups) => {
-  const schedules = [];
-  let capped = false;
-
-  const walk = (index, current) => {
-    if (schedules.length >= MAX_SCHEDULES) {
-      capped = true;
-      return;
-    }
-    if (index === groups.length) {
-      schedules.push([...current]);
-      return;
-    }
-    groups[index].forEach((course) => {
-      current.push(course);
-      walk(index + 1, current);
-      current.pop();
-    });
-  };
-
-  walk(0, []);
-  return { schedules, capped };
 };
 
 const summarizeConflicts = (schedule) => {
@@ -134,7 +128,10 @@ const summarizeConflicts = (schedule) => {
 };
 
 const hasConflict = (schedule, course) =>
-  schedule.some((existing) => conflictBetween(existing, course));
+  schedule.some((existing) => {
+    if (conflictBetween(existing, course)) return true;
+    return baseCourse(existing.courseSection) === baseCourse(course.courseSection);
+  });
 
 const compareScores = (scoreA, scoreB) => {
   if (scoreA.count !== scoreB.count) return scoreA.count - scoreB.count;
@@ -196,8 +193,7 @@ const renderSchedules = (schedules, includeConflicts) => {
     return;
   }
 
-  const MAX_SHOW = 50;
-  const limited = schedules.slice(0, MAX_SHOW);
+  const limited = schedules.slice(0, 50);
 
   limited.forEach((schedule, index) => {
     const conflicts = summarizeConflicts(schedule);
@@ -211,27 +207,17 @@ const renderSchedules = (schedules, includeConflicts) => {
     card.appendChild(heading);
 
     schedule.forEach((course) => {
+      const m = getPrimaryMeeting(course);
+
       const row = document.createElement("div");
       row.className = "course-row";
       row.innerHTML = `
         <strong>${course.courseSection} · ${course.title}</strong>
-        <span>${course.days} ${course.time} · ${course.room}</span>
-        <span>CRN ${course.crn} · ${course.instructor}</span>
+        <span>${m.days} ${m.time} · ${m.room}</span>
+        <span>CRN ${course.crn}</span>
       `;
       card.appendChild(row);
     });
-
-    if (conflicts.length) {
-      const conflictBox = document.createElement("div");
-      conflictBox.className = "conflicts";
-      conflictBox.innerHTML = conflicts
-        .map(
-          (conflict) =>
-            `${conflict.days}: ${conflict.a.courseSection} overlaps ${conflict.b.courseSection}`
-        )
-        .join("<br />");
-      card.appendChild(conflictBox);
-    }
 
     schedulesEl.appendChild(card);
   });
@@ -247,6 +233,7 @@ const renderSelectionList = (results) => {
   selections.forEach((selection) => {
     const result = results?.find((item) => item.selection.id === selection.id);
     const matches = result ? result.matches : [];
+
     const item = document.createElement("div");
     item.className = "selection-item";
     item.draggable = true;
@@ -260,6 +247,7 @@ const renderSelectionList = (results) => {
 
     const matchList = document.createElement("ul");
     matchList.className = "match-list";
+
     if (!selection.active) {
       const li = document.createElement("li");
       li.textContent = "Hidden from schedule.";
@@ -274,8 +262,9 @@ const renderSelectionList = (results) => {
       matchList.appendChild(li);
     } else {
       matches.forEach((course) => {
+        const m = getPrimaryMeeting(course);
         const li = document.createElement("li");
-        li.textContent = `${course.courseSection} · ${course.title} · ${course.days} ${course.time}`;
+        li.textContent = `${course.courseSection} · ${course.title} · ${m.days} ${m.time}`;
         matchList.appendChild(li);
       });
     }
@@ -288,7 +277,7 @@ const renderSelectionList = (results) => {
     toggle.textContent = selection.active ? "Hide" : "Show";
     toggle.addEventListener("click", () => {
       selection.active = !selection.active;
-      update();
+      updateSelectionsOnly();
     });
 
     const remove = document.createElement("button");
@@ -296,7 +285,7 @@ const renderSelectionList = (results) => {
     remove.textContent = "Delete";
     remove.addEventListener("click", () => {
       selections = selections.filter((item) => item.id !== selection.id);
-      update();
+      updateSelectionsOnly();
     });
 
     actions.appendChild(toggle);
@@ -306,50 +295,22 @@ const renderSelectionList = (results) => {
     item.appendChild(details);
     item.appendChild(actions);
     selectionListEl.appendChild(item);
-
-    item.addEventListener("dragstart", (event) => {
-      dragSourceId = selection.id;
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", selection.id);
-    });
-    item.addEventListener("dragover", (event) => {
-      event.preventDefault();
-      item.classList.add("drag-over");
-    });
-    item.addEventListener("dragleave", () => {
-      item.classList.remove("drag-over");
-    });
-    item.addEventListener("drop", (event) => {
-      event.preventDefault();
-      item.classList.remove("drag-over");
-      const sourceId = event.dataTransfer.getData("text/plain") || dragSourceId;
-      const targetId = selection.id;
-      if (!sourceId || sourceId === targetId) return;
-      const sourceIndex = selections.findIndex((s) => s.id === sourceId);
-      const targetIndex = selections.findIndex((s) => s.id === targetId);
-      if (sourceIndex === -1 || targetIndex === -1) return;
-      const [moved] = selections.splice(sourceIndex, 1);
-      selections.splice(targetIndex, 0, moved);
-      update();
-    });
   });
 };
 
 const buildSuggestions = () => {
-  const titleSuggestions = new Set();
+  const seen = new Set();
+  suggestionsEl.innerHTML = "";
 
   catalog.forEach((course) => {
-    titleSuggestions.add(course.title);
-  });
+    const key = course.courseSection;
+    if (seen.has(key)) return;
+    seen.add(key);
 
-  suggestionsEl.innerHTML = "";
-  [...titleSuggestions]
-    .sort()
-    .forEach((value) => {
-      const option = document.createElement("option");
-      option.value = value;
-      suggestionsEl.appendChild(option);
-    });
+    const option = document.createElement("option");
+    option.value = `${course.courseSection} · ${course.title}`;
+    suggestionsEl.appendChild(option);
+  });
 };
 
 const setScheduleOptions = (schedules) => {
@@ -369,12 +330,15 @@ const renderCalendar = (schedule) => {
   if (!schedule || schedule.length === 0) return;
 
   const times = schedule
-    .map((course) => parseTimeRange(course.time))
+    .map((course) => parseTimeRange(getPrimaryMeeting(course).time))
     .filter(Boolean);
-  const minTime = times.length ? Math.min(...times.map((time) => time.start)) : 8 * 60;
-  const maxTime = times.length ? Math.max(...times.map((time) => time.end)) : 17 * 60;
+
+  const minTime = times.length ? Math.min(...times.map((t) => t.start)) : 480;
+  const maxTime = times.length ? Math.max(...times.map((t) => t.end)) : 1020;
+
   const start = Math.floor(minTime / 30) * 30;
   const end = Math.ceil(maxTime / 30) * 30;
+
   const pxPerMin = 1.2;
   const height = Math.max((end - start) * pxPerMin, 320);
 
@@ -390,151 +354,59 @@ const renderCalendar = (schedule) => {
 
   DAYS.forEach((day) => {
     const column = document.createElement("div");
-    column.className = "calendar__column";
-
-    const heading = document.createElement("div");
-    heading.className = "calendar__day";
-    heading.textContent = DAY_LABELS[day];
-
     const events = document.createElement("div");
-    events.className = "calendar__events";
     events.style.height = `${height}px`;
 
     schedule.forEach((course) => {
-      const courseDays = expandDays(course.days);
-      if (!courseDays.includes(day)) return;
-      const time = parseTimeRange(course.time);
+      const m = getPrimaryMeeting(course);
+      if (!expandDays(m.days).includes(day)) return;
+
+      const time = parseTimeRange(m.time);
       if (!time) return;
 
       const event = document.createElement("div");
-      event.className = "event";
       const top = (time.start - start) * pxPerMin;
       const eventHeight = Math.max((time.end - time.start) * pxPerMin, 24);
+
       event.style.top = `${top}px`;
       event.style.height = `${eventHeight}px`;
       event.innerHTML = `
         <strong>${course.courseSection}</strong>
         <div>${course.title}</div>
-        <div>${course.time}</div>
+        <div>${m.time}</div>
       `;
+
       events.appendChild(event);
     });
 
-    column.appendChild(heading);
     column.appendChild(events);
     calendarGridEl.appendChild(column);
   });
-
-  calendarGridEl.style.height = `${height + 34}px`;
 };
 
-const getOrderedActivePreferences = () =>
-  selections
-    .filter((selection) => selection.active)
-    .map((selection) => selection.raw);
-
-const buildWebTree = (orderedPrefs) => {
-  const get = (index) => orderedPrefs[index] || "—";
-
-  return [
-    {
-      name: "Tree 1",
-      choices: [
-        { slot: 1, value: get(0), note: "Top choice" },
-        { slot: 2, value: get(1), note: "Second choice" },
-        { slot: 3, value: get(2), note: "Third choice" },
-        { slot: 4, value: get(3), note: "Backup to 3" },
-        { slot: 5, value: get(4), note: "Backup to 2" },
-        { slot: 6, value: get(2), note: "Third choice again" },
-        { slot: 7, value: get(5), note: "Backup to 6" }
-      ]
-    },
-    {
-      name: "Tree 2",
-      choices: [
-        { slot: 1, value: get(1), note: "Second choice" },
-        { slot: 2, value: get(2), note: "Third choice" },
-        { slot: 3, value: get(3), note: "Fourth choice" },
-        { slot: 4, value: get(4), note: "Backup to 3" },
-        { slot: 5, value: get(5), note: "Backup to 2" },
-        { slot: 6, value: get(3), note: "Fourth choice again" },
-        { slot: 7, value: get(6), note: "Backup to 6" }
-      ]
-    },
-    {
-      name: "Tree 3",
-      choices: [
-        { slot: 1, value: get(2), note: "Third choice" },
-        { slot: 2, value: get(3), note: "Fourth choice" },
-        { slot: 3, value: get(4), note: "Fifth choice" },
-        { slot: 4, value: get(5), note: "Backup to 3" },
-        { slot: 5, value: get(6), note: "Backup to 2" },
-        { slot: 6, value: get(4), note: "Fifth choice again" },
-        { slot: 7, value: get(7), note: "Backup to 6" }
-      ]
-    },
-    {
-      name: "Tree 4",
-      choices: Array.from({ length: 10 }, (_, index) => ({
-        slot: index + 1,
-        value: get(index),
-        note: index === 0 ? "Dream schedule anchor" : "Additional fallback"
-      }))
-    }
-  ];
-};
-
-const renderWebTree = () => {
-  const orderedPrefs = getOrderedActivePreferences();
-
-  if (orderedPrefs.length === 0) {
-    webtreePreviewEl.innerHTML = "<p>No active course preferences yet.</p>";
-    webtreeSummaryEl.textContent = "Add courses in ranked order to preview your WebTree.";
+const updateSelectionsOnly = () => {
+  const activeSelections = selections.filter((s) => s.active);
+  const results = buildMatches(activeSelections);
+  renderSelectionList(results);
+  const missing = results.filter((r) => r.matches.length === 0);
+  if (missing.length) {
+    statusEl.textContent = "Some selections have no matches.";
+    schedulesEl.innerHTML = "";
+    calendarTimesEl.innerHTML = "";
+    calendarGridEl.innerHTML = "";
+    scheduleSelectEl.innerHTML = "";
     return;
   }
-
-  const trees = buildWebTree(orderedPrefs);
-
-  webtreePreviewEl.innerHTML = "";
-  webtreeSummaryEl.textContent = `${orderedPrefs.length} ordered preference${
-    orderedPrefs.length === 1 ? "" : "s"
-  } mapped into Tree 1–4.`;
-
-  trees.forEach((tree) => {
-    const card = document.createElement("article");
-    card.className = "webtree-card";
-
-    const heading = document.createElement("h3");
-    heading.textContent = tree.name;
-    card.appendChild(heading);
-
-    const list = document.createElement("div");
-    list.className = "webtree-list";
-
-    tree.choices.forEach((choice) => {
-      const row = document.createElement("div");
-      row.className = "webtree-row";
-      row.innerHTML = `
-        <div class="webtree-slot">Choice ${choice.slot}</div>
-        <div class="webtree-course">
-          <strong>${choice.value}</strong>
-          <span>${choice.note}</span>
-        </div>
-      `;
-      list.appendChild(row);
-    });
-
-    card.appendChild(list);
-    webtreePreviewEl.appendChild(card);
-  });
+  renderWebTree();
 };
 
 const update = () => {
   statusEl.textContent = "";
   summaryEl.textContent = "";
 
-  const activeSelections = selections.filter((selection) => selection.active);
+  const activeSelections = selections.filter((s) => s.active);
   const results = buildMatches(activeSelections);
+
   renderSelectionList(results);
 
   if (activeSelections.length === 0) {
@@ -542,109 +414,84 @@ const update = () => {
     calendarTimesEl.innerHTML = "";
     calendarGridEl.innerHTML = "";
     scheduleSelectEl.innerHTML = "";
-    statusEl.textContent = "Add at least one active selection to build schedules.";
     renderWebTree();
     return;
   }
 
-  const missing = results.filter((result) => result.matches.length === 0);
-  if (missing.length) {
-    statusEl.textContent = "Some selections have no matches. Update those and try again.";
-    schedulesEl.innerHTML = "";
-    calendarTimesEl.innerHTML = "";
-    calendarGridEl.innerHTML = "";
-    scheduleSelectEl.innerHTML = "";
-    return;
-  }
-
-  const includeConflicts = false;
-  const { schedules, bestScore, capped } = buildRankedSchedules(results, includeConflicts);
+  const { schedules, bestScore } =
+    buildRankedSchedules(results, false);
 
   latestSchedules = schedules;
   setScheduleOptions(schedules);
+
   const selectedIndex = Number(scheduleSelectEl.value || 0);
   renderCalendar(schedules[selectedIndex]);
 
   renderWebTree();
 
-  const totalSelections = results.length;
-  const includedCount = bestScore ? bestScore.count : 0;
-  summaryEl.textContent = `Top schedules include ${includedCount} of ${totalSelections} selections (max 4 per schedule).`;
-  if (capped) {
-    statusEl.textContent = `Search capped at ${MAX_SEARCH} combinations. Showing top ${MAX_SCHEDULES}.`;
-  }
+  summaryEl.textContent = `Top schedules include ${
+    bestScore?.count || 0
+  } of ${results.length} selections.`;
 };
 
-const resolveInputToTitle = (raw) => {
-  const trimmed = raw.trim();
-  if (!trimmed) return "";
+const resolveInput = (raw) => {
+  const cleaned = raw.split("·")[0].trim();
+  const normalizedInput = normalize(cleaned);
 
-  const normalizedInput = normalize(trimmed);
-
-  const exactCrnMatch = catalog.find((course) => String(course.crn) === trimmed);
-  if (exactCrnMatch) return exactCrnMatch.title;
-
-  const exactSectionMatch = catalog.find(
-    (course) => normalize(course.courseSection) === normalizedInput
+  const match = catalog.find(
+    (c) => normalize(c.courseSection) === normalizedInput
   );
-  if (exactSectionMatch) return exactSectionMatch.title;
 
-  const exactTitleMatch = catalog.find(
-    (course) => normalize(course.title) === normalizedInput
-  );
-  if (exactTitleMatch) return exactTitleMatch.title;
-
-  return trimmed;
+  return match ? match.courseSection : cleaned;
 };
 
 const addSelection = () => {
   const raw = courseInput.value.trim();
   if (!raw) return;
 
-  const resolvedTitle = resolveInputToTitle(raw);
+  const resolved = resolveInput(raw);
 
-  const alreadyExists = selections.some(
-    (selection) => normalize(selection.raw) === normalize(resolvedTitle)
-  );
-  if (alreadyExists) {
+  if (
+    selections.some(
+      (s) => normalize(s.raw) === normalize(resolved)
+    )
+  ) {
     courseInput.value = "";
     return;
   }
 
   selections.push({
     id: `sel-${selectionId++}`,
-    raw: resolvedTitle,
+    raw: resolved,
     active: true
   });
 
   courseInput.value = "";
-  update();
+  updateSelectionsOnly();
 };
 
 const init = async () => {
-  try {
-    const response = await fetch("CSCdata.json");
-    catalog = await response.json();
-  } catch (error) {
-    statusEl.textContent = "Unable to load CSCdata.json. Serve this folder with a local web server.";
-    return;
-  }
+  const response = await fetch("http://localhost:3000/courses");
+  catalog = await response.json();
 
   buildSuggestions();
+
   addButton.addEventListener("click", addSelection);
   buildButton.addEventListener("click", update);
+
   scheduleSelectEl.addEventListener("change", () => {
     const index = Number(scheduleSelectEl.value || 0);
     renderCalendar(latestSchedules[index]);
   });
-  courseInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
+
+  courseInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
       addSelection();
     }
   });
 
-  update();
+  updateSelectionsOnly();
 };
 
 init();
