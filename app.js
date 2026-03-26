@@ -77,16 +77,10 @@ const parseTimeRange = (time) => {
   return { start: p(a), end: p(b) };
 };
 
-<<<<<<< Updated upstream
 const populateSuggestions = () => {
   suggestionsEl.innerHTML = catalog
-    .map(c => `<option value="${c.courseSection} - ${c.title}"></option>`)
+    .map(c => `<option value="${c.courseSection}"></option>`)
     .join("");
-=======
-const expandDays = (days) => {
-  if (!days || days.toUpperCase() === "TBA") return [];
-  return DAYS.filter((day) => days.includes(day)); 
->>>>>>> Stashed changes
 };
 
 const expandDays = (days) =>
