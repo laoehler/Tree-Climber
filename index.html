@@ -16,6 +16,22 @@
         </p>
       </header>
 
+      <button command="show-modal" commandfor="help-dialog">Help</button>
+
+      <dialog id="help-dialog">
+        <h2>How to use Tree Climber</h2>
+        <p>
+          1. Use the search bar to select a course
+        </p>
+        <p>
+          2. Drag your courses to your desired priority. Your most selectrive and most desired courses should be scheduled at the top.
+        </p>
+        <p>
+          3. Let Tree Climber generate your Webtree and potential schedules.
+        </p>
+        <button commandfor="help-dialog" command="close">Close</button>
+      </dialog>
+
       <section class="panel">
         <div class="panel__left">
           <label for="course-input">Add a course</label>
