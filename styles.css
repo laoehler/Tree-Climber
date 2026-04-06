@@ -305,22 +305,33 @@ button:focus-visible {
 .calendar__times {
   background: var(--surface-2);
   border-right: 1px solid var(--border);
-  padding: 12px 8px;
+  padding: 0 8px 12px;
   font-size: 12px;
   color: var(--muted);
+}
+
+.calendar__time-spacer {
+  border-bottom: 1px solid var(--border);
+}
+
+.calendar__time-slot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-top: 6px;
+  border-bottom: 1px solid var(--border);
 }
 
 .calendar__grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   position: relative;
-  min-height: 320px;
 }
 
 .calendar__column {
-  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
   border-right: 1px solid var(--border);
-  height: 100%;
 }
 
 .calendar__column:last-child {
@@ -328,8 +339,8 @@ button:focus-visible {
 }
 
 .calendar__day {
-  position: sticky;
-  top: 0;
+  display: flex;
+  align-items: center;
   background: #fff;
   padding: 8px 10px;
   font-size: 12px;
@@ -340,8 +351,13 @@ button:focus-visible {
 
 .calendar__events {
   position: relative;
-  height: 100%;
-  min-height: 320px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(72px - 1px),
+    rgba(221, 211, 199, 0.9) calc(72px - 1px),
+    rgba(221, 211, 199, 0.9) 72px
+  );
 }
 
 .event {
@@ -355,6 +371,7 @@ button:focus-visible {
   font-size: 12px;
   color: var(--event-text);
   overflow: hidden;
+  z-index: 1;
 }
 
 .event strong {
