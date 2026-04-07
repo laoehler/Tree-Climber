@@ -72,7 +72,15 @@ function App() {
       setStatus(`Loaded ${nextCatalog.length} courses from the backend.`);
     };
 
-    loadCourses();
+const populateSuggestions = () => {
+  suggestionsEl.innerHTML = catalog
+    .map(c => {
+      const meeting = c.meetings[0];
+      const time = meeting ? `${meeting.days} ${meeting.time}` : "TBA";
+      return `<option value="${c.title}" label="${c.courseSection} — ${c.crn} (${time})"></option>`;
+    })
+    .join("");
+};
 
     return () => {
       active = false;
