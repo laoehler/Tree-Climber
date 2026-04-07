@@ -44,7 +44,7 @@ function CourseInputPanel(props) {
       e(
         "datalist",
         { id: "course-suggestions" },
-        suggestions.map((title) => e("option", { key: title, value: title }))
+        suggestions.map((s) => e("option", { key: s.label, value: s.value, label: s.label }))
       ),
       e(
         "div",
