@@ -6,68 +6,9 @@
     <title>Course Schedule Builder</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
-    <main class="page">
-      <header class="hero">
-        <div class="hero__badge">Webtree Builder</div>
-        <h1>Pick courses. See schedules.</h1>
-        <p>
-          Enter a CRN, course title, or course section. Add multiple selections to explore possible 4-course schedules and recieve a recommendation of how to fill out your webtree.
-        </p>
-      </header>
-
-      <section class="panel">
-        <div class="panel__left">
-          <label for="course-input">Add a course</label>
-          <div class="input-row">
-            <input
-              id="course-input"
-              list="course-suggestions"
-              placeholder="CRN, title, or course section"
-              autocomplete="off"
-            />
-            <button id="add">Add</button>
-          </div>
-          <datalist id="course-suggestions"></datalist>
-          <div class="panel__actions">
-            <button id="build">Build schedules</button>
-            <!-- <button id="clear">Clear selections</button> -->
-          </div>
-          <div id="status" class="status"></div>
-          <div class="selections">
-            <h2>Selections</h2>
-            <div id="selection-list" class="selection-list"></div>
-          </div>
-        </div>
-      </section>
-      <section class="webtree">
-        <div class="results__header">
-          <h2>WebTree Preview</h2>
-          <p class="summary" id="webtree-summary">
-            Your ordered preferences mapped into Tree 1–4.
-          </p>
-        </div>
-
-        <div id="webtree-preview" class="webtree-preview"></div>
-      </section>
-
-      <section class="results">
-        <div class="results__header">
-          <h2>Schedules</h2>
-          <div class="schedule-controls">
-            <label for="schedule-select">Preview schedule</label>
-            <select id="schedule-select"></select>
-          </div>
-          <div id="summary" class="summary"></div>
-        </div>
-        <div class="calendar">
-          <div class="calendar__times" id="calendar-times"></div>
-          <div class="calendar__grid" id="calendar-grid"></div>
-        </div>
-        <div id="schedules" class="schedules"></div>
-      </section>
-    </main>
-
-    <script type ="module" src="app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

@@ -454,35 +454,6 @@ button:focus-visible {
   gap: 18px;
 }
 
-.webtree-card {
-  background: var(--card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  padding: 16px;
-  box-shadow: var(--shadow);
-}
-
-.webtree-card h3 {
-  margin: 0 0 12px;
-  color: var(--accent-2);
-}
-
-.webtree-list {
-  display: grid;
-  gap: 8px;
-}
-
-.webtree-row {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 10px;
-  align-items: start;
-  padding: 10px;
-  border-radius: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
 .webtree-slot {
   font-size: 12px;
   font-weight: 700;
@@ -500,4 +471,403 @@ button:focus-visible {
   margin-top: 2px;
   font-size: 12px;
   color: var(--muted);
+}
+
+.webtree {
+  margin-top: 32px;
+}
+
+.webtree-preview {
+  margin-top: 16px;
+}
+
+.flow-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.flow-tree {
+  background: var(--card);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.flow-tree--tree4 {
+  grid-column: 1 / -1;
+}
+
+.flow-tree__header h3 {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+}
+
+.flow-tree__header p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.flow-tree__choices {
+  display: grid;
+  gap: 10px;
+}
+
+.flow-tree__choices--tree4 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.flow-choice {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.flow-choice::after {
+  content: "→";
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 14px;
+  color: var(--accent);
+  opacity: 0.65;
+}
+
+.flow-choice:last-child::after,
+.flow-tree--tree4 .flow-choice::after {
+  content: "";
+}
+
+.flow-choice--empty {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.flow-choice--compact {
+  min-height: 126px;
+}
+
+.flow-choice__number {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.flow-choice__body strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+
+.flow-choice__body span,
+.flow-choice__body em {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.flow-choice__body em {
+  color: var(--accent-2);
+  font-style: normal;
+  margin-top: 6px;
+}
+
+.flow-choice__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.flow-rules {
+  margin-top: 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.flow-rules h3 {
+  margin: 0 0 10px;
+  color: var(--accent-2);
+}
+
+.flow-rules ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.webtree {
+  margin-top: 32px;
+}
+
+.webtree-preview {
+  margin-top: 16px;
+  display: grid;
+  gap: 20px;
+}
+
+.flowchart-top {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.flowchart-connector {
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent-2);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.flow-tree-diagram {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.flow-tree-diagram--tree4 {
+  width: 100%;
+}
+
+.flow-tree-diagram__header h3 {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+}
+
+.flow-tree-diagram__header p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.flow-tree-diagram__body {
+  display: grid;
+  gap: 10px;
+}
+
+.flow-tree-diagram__body--tree4 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.flow-node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.flow-node--empty {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.flow-node--tree4 {
+  grid-template-columns: 1fr;
+  min-height: 120px;
+}
+
+.flow-node__badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.flow-node__content strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.flow-node__content span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.flow-node__arrow {
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  transform: translateX(-50%);
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 980px) {
+  .flowchart-top {
+    grid-template-columns: 1fr;
+  }
+
+  .flow-node__arrow {
+    display: none;
+  }
+}
+
+.webtree {
+  margin-top: 32px;
+}
+
+.webtree-preview {
+  margin-top: 16px;
+  display: grid;
+  gap: 20px;
+}
+
+.flowchart-top {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.flowchart-connector {
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent-2);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  margin: 4px 0;
+}
+
+.flow-tree-diagram {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+  min-width: 0;
+}
+
+.flow-tree-diagram--tree4 {
+  width: 100%;
+}
+
+.flow-tree-diagram__header {
+  margin-bottom: 14px;
+}
+
+.flow-tree-diagram__header h3 {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+}
+
+.flow-tree-diagram__header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.flow-tree-diagram__body {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.flow-tree-diagram__body--tree4 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.flow-node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.flow-node--empty {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.flow-node--tree4 {
+  grid-template-columns: 1fr;
+  min-height: 120px;
+}
+
+.flow-node__badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.flow-node__content {
+  min-width: 0;
+}
+
+.flow-node__content strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.flow-node__content span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.flow-node__arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 1100px) {
+  .flowchart-top {
+    grid-template-columns: 1fr;
+  }
+
+  .flow-tree-diagram__body--tree4 {
+    grid-template-columns: 1fr;
+  }
 }
