@@ -447,11 +447,12 @@ button:focus-visible {
   margin-top: 32px;
 }
 
-.webtree-preview {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
+
+.webtree-preview-vertical {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
 }
 
 .webtree-slot {
@@ -622,11 +623,111 @@ button:focus-visible {
   gap: 20px;
 }
 
+
+/* Hide old flowchart-top for new vertical layout */
 .flowchart-top {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  align-items: start;
+  display: none;
+}
+/* Tree structure layout for each tree */
+.tree-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 20px 16px 28px 16px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.tree-block__header {
+  margin-bottom: 18px;
+}
+.tree-block__header h3 {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+}
+.tree-block__header p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.tree-structure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+.tree-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 0;
+}
+.tree-row-horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.tree-node {
+  min-width: 110px;
+  min-height: 80px;
+  background: #eaf2fb;
+  border: 2.5px solid #3a7bd5;
+  border-radius: 12px;
+  padding: 10px 12px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(58,123,213,0.08);
+}
+.tree-1-node { background: #eaf2fb; border-color: #3a7bd5; }
+.tree-2-node { background: #fff4e6; border-color: #ff9800; }
+.tree-3-node { background: #e6f7e6; border-color: #43a047; }
+.tree-4-node { background: #fffbe6; border-color: #ffd600; min-width: 80px; }
+.tree-node--empty { opacity: 0.6; border-style: dashed; }
+.tree-node__label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 4px;
+}
+.tree-node__content {
+  text-align: center;
+}
+.tree-node__content strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.tree-node__content span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.tree-1-main, .tree-2-main, .tree-3-main {
+  border-width: 3.5px;
+  font-size: 17px;
+  box-shadow: 0 4px 16px rgba(58,123,213,0.13);
+}
+.tree-2-main { border-color: #ff9800; }
+.tree-3-main { border-color: #43a047; }
+.tree-4 {
+  width: 100%;
+  margin-top: 0;
+}
+.tree-4-node {
+  background: #fffbe6;
+  border-color: #ffd600;
+  min-width: 80px;
+  min-height: 70px;
+}
+@media (max-width: 700px) {
+  .tree-block { max-width: 98vw; }
+  .tree-row, .tree-row-horizontal { gap: 8px; }
+  .tree-node { min-width: 80px; padding: 7px 4px; }
 }
 
 .flowchart-connector {
