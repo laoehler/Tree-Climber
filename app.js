@@ -88,9 +88,16 @@ const populateSuggestions = () => {
   }, []);
 
   const suggestions = useMemo(
-    () => [...new Set(catalog.map((course) => course.title).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
-    [catalog]
-  );
+  () =>
+    catalog
+      .filter((course) => course.title)
+      .map((course) => ({
+        label: [course.title, course.courseSection, course.crn].filter(Boolean).join(" · "),
+        value: course.courseSection || course.crn || course.title
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+  [catalog]
+);
 
   const selectionMatchesById = useMemo(() => {
     const matches = new Map();
