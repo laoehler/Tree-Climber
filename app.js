@@ -79,7 +79,11 @@ const parseTimeRange = (time) => {
 
 const populateSuggestions = () => {
   suggestionsEl.innerHTML = catalog
-    .map(c => `<option value="${c.courseSection} - ${c.title}"></option>`)
+    .map(c => {
+      const meeting = c.meetings[0];
+      const time = meeting ? `${meeting.days} ${meeting.time}` : "TBA";
+      return `<option value="${c.title}" label="${c.courseSection} — ${c.crn} (${time})"></option>`;
+    })
     .join("");
 };
 
