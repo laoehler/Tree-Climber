@@ -1,81 +1,76 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { buildCourseSearchBlob, buildRankedSchedules, buildTrees, getSelectionMatches, normalize, parseTimeRange } from "./lib/courseUtils.js";
+import { createRoot, e, useEffect, useMemo, useState } from "./ui/react.js";
+import { CourseInputPanel } from "./components/CourseInputPanel.js";
+import { Hero } from "./components/Hero.js";
+import { SchedulesSection } from "./components/SchedulesSection.js";
+import { WebtreeSection } from "./components/WebtreeSection.js";
 
 const supabase = createClient(
   "https://csotlkemhfrucmubopsr.supabase.co",
   "sb_publishable_k25RlLfIDRTbeQrncvPopw_hB68GuIS"
 );
 
-const courseInput = document.getElementById("course-input");
-const addButton = document.getElementById("add");
-const buildButton = document.getElementById("build");
-const schedulesEl = document.getElementById("schedules");
-const statusEl = document.getElementById("status");
-const summaryEl = document.getElementById("summary");
-const selectionListEl = document.getElementById("selection-list");
-const scheduleSelectEl = document.getElementById("schedule-select");
-const calendarTimesEl = document.getElementById("calendar-times");
-const calendarGridEl = document.getElementById("calendar-grid");
-const suggestionsEl = document.getElementById("course-suggestions");
+function App() {
+  const [catalog, setCatalog] = useState([]);
+  const [status, setStatus] = useState("Loading course catalog...");
+  const [inputValue, setInputValue] = useState("");
+  const [selectionId, setSelectionId] = useState(0);
+  const [selections, setSelections] = useState([]);
+  const [selectedScheduleIndex, setSelectedScheduleIndex] = useState(0);
 
-let catalog = [];
-let selections = [];
-let selectionId = 0;
-let latestSchedules = [];
+  useEffect(() => {
+    let active = true;
 
-const DAYS = ["M", "T", "W", "R", "F"];
-const MAX_SCHEDULES = 50;
+    const loadCourses = async () => {
+      const { data, error } = await supabase
+        .from("course")
+        .select(`
+          crn,
+          course_code,
+          course_title,
+          department,
+          meeting:meeting (
+            weekdays,
+            class_time,
+            start_time,
+            end_time,
+            room
+          )
+        `);
 
-const normalize = (v) => v.toLowerCase().replace(/\s+/g, " ").trim();
+      if (!active) return;
 
-const loadCourses = async () => {
-  const { data, error } = await supabase
-    .from("course")
-    .select(`
-      crn,
-      course_code,
-      course_title,
-      meeting:meeting (
-        weekdays,
-        class_time,
-        room
-      )
-    `)
+      if (error) {
+        setStatus(error.message);
+        return;
+      }
 
-  if (error) {
-    console.error(error);
-    statusEl.textContent = error.message;
-    return;
-  }
+      const nextCatalog = (data || []).map((course) => {
+        const meetings = (course.meeting || []).map((meeting) => ({
+          days: meeting.weekdays || "TBA",
+          time: meeting.class_time || "TBA",
+          room: meeting.room || "",
+          range: parseTimeRange(meeting.class_time, meeting.start_time, meeting.end_time)
+        }));
 
-  catalog = data.map(course => ({
-    crn: course.crn,
-    courseSection: course.course_code,
-    title: course.course_title,
-    meetings: (course.meeting || []).map(m => ({
-      days: m.weekdays,
-      time: m.class_time,
-      room: m.room
-    }))
-  }));
-};
+        const normalizedCourse = {
+          crn: String(course.crn || ""),
+          courseSection: course.course_code || "",
+          title: course.course_title || "Untitled course",
+          department: course.department || "",
+          meetings
+        };
 
-const parseTimeRange = (time) => {
-  if (!time || time.toUpperCase() === "TBA") return null;
-  const [a, b] = time.split("-");
-  if (!b) return null;
+        return {
+          ...normalizedCourse,
+          searchBlob: buildCourseSearchBlob(normalizedCourse)
+        };
+      });
 
-  const p = (t) => {
-    const m = t.trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-    if (!m) return null;
-    let h = +m[1];
-    const min = +m[2];
-    if (m[3].toUpperCase() === "PM" && h !== 12) h += 12;
-    if (m[3].toUpperCase() === "AM" && h === 12) h = 0;
-    return h * 60 + min;
-  };
-
-  return { start: p(a), end: p(b) };
-};
+      setCatalog(nextCatalog);
+      setStatus(`Loaded ${nextCatalog.length} courses from the backend.`);
+    };
 
 const populateSuggestions = () => {
   suggestionsEl.innerHTML = catalog
@@ -87,101 +82,144 @@ const populateSuggestions = () => {
     .join("");
 };
 
-const expandDays = (days) =>
-  days && days !== "TBA" ? DAYS.filter(d => days.includes(d)) : [];
-
-const getPrimaryMeeting = (c) => c.meetings[0];
-
-const baseCourse = (cs) => cs.split("-").slice(0, 2).join("-");
-
-const conflictBetween = (a, b) => {
-  const mA = getPrimaryMeeting(a);
-  const mB = getPrimaryMeeting(b);
-
-  const shared = expandDays(mA.days).filter(d =>
-    expandDays(mB.days).includes(d)
-  );
-  if (!shared.length) return null;
-
-  const tA = parseTimeRange(mA.time);
-  const tB = parseTimeRange(mB.time);
-  if (!tA || !tB) return null;
-
-  if (tA.start < tB.end && tB.start < tA.end) return true;
-  return null;
-};
-
-const hasConflict = (schedule, course) =>
-  schedule.some(existing =>
-    conflictBetween(existing, course) ||
-    baseCourse(existing.courseSection) === baseCourse(course.courseSection)
-  );
-
-const buildMatches = (list) =>
-  list.map(sel => {
-    const needle = normalize(sel.raw);
-    return {
-      selection: sel,
-      matches: catalog.filter(c =>
-        normalize(c.courseSection) === needle ||
-        normalize(c.title).includes(needle)
-      )
+    return () => {
+      active = false;
     };
-  });
+  }, []);
 
-const buildRankedSchedules = (results) => {
-  const out = [];
+  const suggestions = useMemo(
+    () => [...new Set(catalog.map((course) => course.title).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
+    [catalog]
+  );
 
-  const dfs = (i, curr) => {
-    if (i === results.length) {
-      out.push([...curr]);
+  const selectionMatchesById = useMemo(() => {
+    const matches = new Map();
+    selections.forEach((selection) => {
+      matches.set(selection.id, getSelectionMatches(catalog, selection.raw));
+    });
+    return matches;
+  }, [catalog, selections]);
+
+  const scheduleResults = useMemo(() => {
+    const activeSelections = selections.filter((selection) => selection.active);
+    const results = activeSelections.map((selection) => ({
+      selection,
+      matches: selectionMatchesById.get(selection.id) || []
+    }));
+
+    return {
+      activeSelections,
+      results,
+      schedules: buildRankedSchedules(results)
+    };
+  }, [selectionMatchesById, selections]);
+
+  useEffect(() => {
+    if (selectedScheduleIndex >= scheduleResults.schedules.length) {
+      setSelectedScheduleIndex(0);
+    }
+  }, [scheduleResults.schedules.length, selectedScheduleIndex]);
+
+  const selectedSchedule = scheduleResults.schedules[selectedScheduleIndex] || [];
+
+  const webtreeTrees = useMemo(
+    () => buildTrees(selections, selectedSchedule, selectionMatchesById),
+    [selections, selectedSchedule, selectionMatchesById]
+  );
+
+  const scheduleSummary = useMemo(() => {
+    if (!scheduleResults.activeSelections.length) {
+      return "Add courses to generate schedules.";
+    }
+
+    const unmatchedSelections = scheduleResults.results.filter((result) => result.matches.length === 0);
+    const matchedCount = scheduleResults.activeSelections.length - unmatchedSelections.length;
+    const matchedLabel = matchedCount === 1 ? "1 selection matched" : `${matchedCount} selections matched`;
+    const scheduleCountLabel =
+      scheduleResults.schedules.length === 1
+        ? "1 schedule generated"
+        : `${scheduleResults.schedules.length} schedules generated`;
+
+    if (unmatchedSelections.length) {
+      return `${matchedLabel}. ${scheduleCountLabel}. ${unmatchedSelections.length} selections did not match the backend catalog.`;
+    }
+
+    return `${matchedLabel}. ${scheduleCountLabel} from backend course data.`;
+  }, [scheduleResults]);
+
+  const addSelection = () => {
+    const raw = inputValue.trim();
+    if (!raw) return;
+
+    const matches = getSelectionMatches(catalog, raw);
+    const exactMatch = matches.find((course) =>
+      normalize(course.title) === normalize(raw) ||
+      normalize(course.courseSection) === normalize(raw) ||
+      normalize(course.crn) === normalize(raw)
+    ) || matches[0] || null;
+
+    const displayTitle = exactMatch ? exactMatch.title : raw;
+    const displaySection = exactMatch ? exactMatch.courseSection : "";
+
+    const duplicate = selections.some((selection) => normalize(selection.raw) === normalize(raw));
+    if (duplicate) {
+      setStatus("That course is already in your list.");
+      setInputValue("");
       return;
     }
 
-    dfs(i + 1, curr);
-
-    results[i].matches.forEach(c => {
-      if (!hasConflict(curr, c)) {
-        curr.push(c);
-        dfs(i + 1, curr);
-        curr.pop();
+    setSelections((current) => [
+      ...current,
+      {
+        id: selectionId,
+        raw,
+        active: true,
+        displayTitle,
+        displaySection,
+        course: exactMatch
       }
-    });
+    ]);
+    setSelectionId((current) => current + 1);
+    setInputValue("");
+    setSelectedScheduleIndex(0);
+    setStatus(`Added "${displayTitle}".`);
   };
 
-  dfs(0, []);
-  return out.slice(0, MAX_SCHEDULES);
-};
+  const removeSelection = (id) => {
+    setSelections((current) => current.filter((selection) => selection.id !== id));
+    setSelectedScheduleIndex(0);
+  };
 
-const renderSchedules = (schedules) => {
-  schedulesEl.innerHTML = schedules.length
-    ? schedules.map((s, i) =>
-        `<div><h3>Schedule ${i + 1}</h3>${
-          s.map(c => `<div>${c.courseSection}</div>`).join("")
-        }</div>`
-      ).join("")
-    : "<p>No schedules</p>";
-};
+  const buildSchedules = () => {
+    setSelectedScheduleIndex(0);
+    setStatus("Schedules refreshed from your current backend-backed selections.");
+  };
 
-const addSelection = () => {
-  const raw = courseInput.value.trim();
-  if (!raw) return;
-  selections.push({ id: selectionId++, raw, active: true });
-  courseInput.value = "";
-};
+  return e(
+    "main",
+    { className: "page" },
+    e(Hero),
+    e(CourseInputPanel, {
+      inputValue,
+      onInputChange: setInputValue,
+      onAdd: addSelection,
+      onBuild: buildSchedules,
+      status,
+      suggestions,
+      selections,
+      selectionMatchesById,
+      onRemoveSelection: removeSelection
+    }),
+    e(WebtreeSection, { trees: webtreeTrees }),
+    e(SchedulesSection, {
+      schedules: scheduleResults.schedules,
+      selectedScheduleIndex,
+      onSelectSchedule: setSelectedScheduleIndex,
+      summary: scheduleSummary,
+      selectedSchedule
+    })
+  );
+}
 
-const update = () => {
-  const results = buildMatches(selections);
-  const schedules = buildRankedSchedules(results);
-  latestSchedules = schedules;
-  renderSchedules(schedules);
-};
-
-const init = async () => {
-  await loadCourses();
-  populateSuggestions();
-  addButton.onclick = addSelection;
-  buildButton.onclick = update;
-};
-
-init();
+const root = createRoot(document.getElementById("root"));
+root.render(e(App));
