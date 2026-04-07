@@ -72,7 +72,15 @@ function App() {
       setStatus(`Loaded ${nextCatalog.length} courses from the backend.`);
     };
 
-    loadCourses();
+const populateSuggestions = () => {
+  suggestionsEl.innerHTML = catalog
+    .map(c => {
+      const meeting = c.meetings[0];
+      const time = meeting ? `${meeting.days} ${meeting.time}` : "TBA";
+      return `<option value="${c.title}" label="${c.courseSection} — ${c.crn} (${time})"></option>`;
+    })
+    .join("");
+};
 
     return () => {
       active = false;
@@ -80,9 +88,16 @@ function App() {
   }, []);
 
   const suggestions = useMemo(
-    () => [...new Set(catalog.map((course) => course.title).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
-    [catalog]
-  );
+  () =>
+    catalog
+      .filter((course) => course.title)
+      .map((course) => ({
+        label: [course.title, course.courseSection, course.crn].filter(Boolean).join(" · "),
+        value: course.courseSection || course.crn || course.title
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+  [catalog]
+);
 
   const selectionMatchesById = useMemo(() => {
     const matches = new Map();
