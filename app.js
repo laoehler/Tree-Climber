@@ -3,7 +3,6 @@ import { buildCourseSearchBlob, buildRankedSchedules, buildTrees, getSelectionMa
 import { createRoot, e, useEffect, useMemo, useState } from "./ui/react.js";
 import { CourseInputPanel } from "./components/CourseInputPanel.js";
 import { Hero } from "./components/Hero.js";
-import { HelpModal } from "./components/HelpModal.js";
 import { SchedulesSection } from "./components/SchedulesSection.js";
 import { WebtreeSection } from "./components/WebtreeSection.js";
 
@@ -19,7 +18,6 @@ function App() {
   const [selectionId, setSelectionId] = useState(0);
   const [selections, setSelections] = useState([]);
   const [selectedScheduleIndex, setSelectedScheduleIndex] = useState(0);
-  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -191,6 +189,10 @@ function App() {
     setSelectedScheduleIndex(0);
   };
 
+  const reorderSelections = (newSelections) => {
+    setSelections(newSelections);
+  };
+
   const buildSchedules = () => {
     setSelectedScheduleIndex(0);
     setStatus("Schedules refreshed from your current backend-backed selections.");
@@ -199,7 +201,7 @@ function App() {
   return e(
     "main",
     { className: "page" },
-    e(Hero, { onHelpClick: () => setShowHelp(true) }),
+    e(Hero),
     e(CourseInputPanel, {
       inputValue,
       onInputChange: setInputValue,
@@ -209,7 +211,8 @@ function App() {
       suggestions,
       selections,
       selectionMatchesById,
-      onRemoveSelection: removeSelection
+      onRemoveSelection: removeSelection,
+      onReorderSelections: reorderSelections
     }),
     e(WebtreeSection, { trees: webtreeTrees }),
     e(SchedulesSection, {
@@ -219,7 +222,6 @@ function App() {
       summary: scheduleSummary,
       selectedSchedule
     })
-    , showHelp ? e(HelpModal, { onClose: () => setShowHelp(false) }) : null
   );
 }
 

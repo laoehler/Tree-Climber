@@ -11,7 +11,8 @@ function CourseInputPanel(props) {
     suggestions,
     selections,
     selectionMatchesById,
-    onRemoveSelection
+    onRemoveSelection,
+    onReorderSelections
   } = props;
 
   return e(
@@ -55,11 +56,12 @@ function CourseInputPanel(props) {
       e(
         "div",
         { className: "selections" },
-        e("h2", null, "Selections"),
+        e("h2", null, "Selections - Drag and drop to reorder!"), //kind of ugly style, could change for better look
         e(SelectionList, {
           selections,
           selectionMatchesById,
-          onRemoveSelection
+          onRemoveSelection,
+          onReorderSelections
         })
       )
     )
