@@ -374,6 +374,12 @@ button:focus-visible {
   z-index: 1;
 }
 
+.event.conflict {
+  background: #e6e6e6;   
+  border: 1px solid #999;
+  color: #333;
+}
+
 .event strong {
   display: block;
   font-size: 12px;
@@ -397,52 +403,6 @@ button:focus-visible {
 .schedule-card h3 {
   margin: 0 0 12px;
   color: var(--accent-2);
-}
-
-/* Modal / Help styles */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1200;
-}
-.modal__overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-}
-.modal__content {
-  position: relative;
-  background: var(--card);
-  border-radius: 12px;
-  padding: 20px 20px 18px;
-  max-width: 520px;
-  width: calc(100% - 40px);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-  z-index: 2;
-}
-.modal__close {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  background: transparent;
-  color: var(--muted);
-  border: none;
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-}
-.modal__content h2 {
-  margin-top: 0;
-}
-.modal__content ol {
-  margin: 12px 0 0 20px;
-}
-.modal__content li {
-  margin-bottom: 8px;
 }
 
 .course-row {

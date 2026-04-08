@@ -4,6 +4,37 @@ import { expandDays } from "../lib/courseUtils.js";
 import { CalendarTimes } from "./CalendarTimes.js";
 import { CalendarEvent } from "./CalendarEvent.js";
 
+function mergeMeetings(meetings) {
+  const merged = [];
+
+  meetings.forEach((m) => {
+    let found = false;
+
+    for (const existing of merged) {
+      const overlap =
+        m.range &&
+        existing.range &&
+        m.range.start < existing.range.end &&
+        existing.range.start < m.range.end;
+
+      if (overlap) {
+        existing.courses.push(m.course);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      merged.push({
+        ...m,
+        courses: [m.course]
+      });
+    }
+  });
+
+  return merged;
+}
+
 function Calendar({ schedule }) {
   return e(
     "div",
@@ -12,8 +43,19 @@ function Calendar({ schedule }) {
     e(
       "div",
       { className: "calendar__grid" },
-      DAYS.map((day) =>
-        e(
+      DAYS.map((day) => {
+        const dayMeetings = schedule.flatMap((course) =>
+          course.meetings
+            .filter((meeting) => expandDays(meeting.days).includes(day))
+            .map((meeting) => ({
+              ...meeting,
+              course
+            }))
+        );
+
+        const mergedMeetings = mergeMeetings(dayMeetings);
+
+        return e(
           "div",
           { key: day, className: "calendar__column" },
           e(
@@ -24,20 +66,15 @@ function Calendar({ schedule }) {
           e(
             "div",
             { className: "calendar__events", style: { height: `${CALENDAR_BODY_HEIGHT}px` } },
-            schedule.flatMap((course) =>
-              course.meetings
-                .filter((meeting) => expandDays(meeting.days).includes(day))
-                .map((meeting, index) =>
-                  e(CalendarEvent, {
-                    key: `${course.crn}-${day}-${index}`,
-                    course,
-                    meeting
-                  })
-                )
+            mergedMeetings.map((meeting, index) =>
+              e(CalendarEvent, {
+                key: `merged-${day}-${index}`,
+                meeting
+              })
             )
           )
-        )
-      )
+        );
+      })
     )
   );
 }
