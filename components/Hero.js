@@ -1,6 +1,6 @@
 import { e } from "../ui/react.js";
 
-function Hero() {
+function Hero({ onHelpClick }) {
   return e(
     "header",
     { className: "hero" },
@@ -10,6 +10,15 @@ function Hero() {
       "p",
       null,
       "Enter a CRN, course title, or course section. Add multiple selections to explore possible 4-course schedules and receive a recommendation of how to fill out your webtree."
+    ),
+    e(
+      "div",
+      { style: { marginTop: 12 } },
+      e(
+        "button",
+        { className: "pill", type: "button", onClick: onHelpClick },
+        "Help"
+      )
     )
   );
 }

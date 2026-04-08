@@ -3,6 +3,7 @@ import { buildCourseSearchBlob, buildRankedSchedules, buildTrees, getSelectionMa
 import { createRoot, e, useEffect, useMemo, useState } from "./ui/react.js";
 import { CourseInputPanel } from "./components/CourseInputPanel.js";
 import { Hero } from "./components/Hero.js";
+import { HelpModal } from "./components/HelpModal.js";
 import { SchedulesSection } from "./components/SchedulesSection.js";
 import { WebtreeSection } from "./components/WebtreeSection.js";
 
@@ -18,6 +19,7 @@ function App() {
   const [selectionId, setSelectionId] = useState(0);
   const [selections, setSelections] = useState([]);
   const [selectedScheduleIndex, setSelectedScheduleIndex] = useState(0);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -197,7 +199,7 @@ function App() {
   return e(
     "main",
     { className: "page" },
-    e(Hero),
+    e(Hero, { onHelpClick: () => setShowHelp(true) }),
     e(CourseInputPanel, {
       inputValue,
       onInputChange: setInputValue,
@@ -217,6 +219,7 @@ function App() {
       summary: scheduleSummary,
       selectedSchedule
     })
+    , showHelp ? e(HelpModal, { onClose: () => setShowHelp(false) }) : null
   );
 }
 
