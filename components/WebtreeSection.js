@@ -1,9 +1,41 @@
 import { e } from "../ui/react.js";
 import { formatMeetingLabel } from "../lib/courseUtils.js";
 
+function handleDownloadPDF() {
+  const element = document.querySelector(".webtree-preview-vertical");
+  if (!element) return;
+
+  html2canvas(element, { scale: 2 }).then((canvas) => {
+    const imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = 210;   
+    const pageHeight = 295;  
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save("webtree.pdf");
+  });
+}
 
 function renderTree1(choices) {
-  // Tree 1: 1 -> 2,5 -> 3,4,6,7
   return e("div", { className: "tree-structure tree-1" },
     e("div", { className: "tree-row" },
       renderNode(choices[0], 1, "tree-1-node tree-1-main")
@@ -22,7 +54,6 @@ function renderTree1(choices) {
 }
 
 function renderTree2(choices) {
-  // Tree 2: 1 -> 2,5 -> 3,4,6,7
   return e("div", { className: "tree-structure tree-2" },
     e("div", { className: "tree-row" },
       renderNode(choices[0], 1, "tree-2-node tree-2-main")
@@ -41,7 +72,6 @@ function renderTree2(choices) {
 }
 
 function renderTree3(choices) {
-  // Tree 3: 1 -> 2,5 -> 3,4,6,7
   return e("div", { className: "tree-structure tree-3" },
     e("div", { className: "tree-row" },
       renderNode(choices[0], 1, "tree-3-node tree-3-main")
@@ -60,7 +90,6 @@ function renderTree3(choices) {
 }
 
 function renderTree4(choices) {
-  // Tree 4: horizontal bar of 10 nodes
   return e("div", { className: "tree-structure tree-4" },
     e("div", { className: "tree-row tree-row-horizontal" },
       choices.map((choice, i) => renderNode(choice, i + 1, "tree-4-node"))
@@ -121,7 +150,29 @@ function WebtreeSection({ trees }) {
     e(
       "div",
       { className: "results__header" },
-      e("h2", null, "WebTree Preview"),
+      e(
+        "div",
+        {
+          style: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }
+        },
+        e("h2", null, "WebTree Preview"),
+        trees.length > 0 &&
+          e(
+            "button",
+            {
+              className: "pill",
+              onClick: handleDownloadPDF,
+              style: {
+                marginLeft: "12px"
+              }
+            },
+            "Download PDF"
+          )
+      ),
       e(
         "p",
         { className: "summary" },
