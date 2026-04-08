@@ -67,7 +67,7 @@ function SelectionList({
           ),
           e(
             "span",
-            null,
+            { style: { marginLeft: "8px" } },
             displayCourse?.courseSection ||
               selection.displaySection ||
               selection.raw
