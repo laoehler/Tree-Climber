@@ -1,13 +1,83 @@
 # Tree-Climber
 
-__Group #4__
+**Tree Climber** is a web app for planning course schedules and visualizing **Webtree**-style preference trees. You search the course catalog, rank selections, and the app suggests conflict-free schedules and tree layouts you can preview on a weekly calendar or export as a PDF.
 
-__Group Members:__
+## Team
 
-- Lars Oehler - Developer and Product Owner
+**Group #4**
 
-- Madeline Shi - Developer
+- Lars Oehler — Developer and Product Owner
+- Madeline Shi — Developer
+- Ross Hope — Developer and Scrum Master
+- Samantha Galvan — Developer
 
-- Ross Hope - Developer and Scrum Master
+## Tech stack
 
-- Samantha Galvan - Developer
+- **React 18** with **Vite** (dev server, hot reload, production builds)
+- **Supabase** — course and meeting data loaded from a hosted Supabase project (PostgreSQL + API)
+- **html2canvas** + **jsPDF** — “Download PDF” for the Webtree preview
+
+There is no separate Node/Express server in this repo; the browser talks to Supabase directly using the public (anon) API key pattern.
+
+## Prerequisites
+
+- **Node.js** 18+ (LTS recommended)
+- **npm** (comes with Node)
+
+## Setup
+
+1. Clone the repository and open the project folder.
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. **Optional — Supabase configuration**
+
+   The app can read `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from a `.env` or `.env.local` file at the project root (see `.env.example`). If you omit them, built-in defaults in `src/App.jsx` are used so local development still works.
+
+   Copy the example and edit:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Fill in values from your [Supabase project settings](https://supabase.com/dashboard) (URL and anon/public key). Do not commit real keys if your repo is public; keep `.env.local` out of version control (it is listed in `.gitignore`).
+
+## Commands
+
+| Command           | Description                                      |
+|-------------------|--------------------------------------------------|
+| `npm run dev`     | Start the Vite dev server (default: `localhost:5173`) |
+| `npm run build`   | Production build output in `dist/`               |
+| `npm run preview` | Serve the `dist/` build locally to verify production output |
+
+## How to use the app
+
+1. **Load courses** — On open, the app loads the course catalog from Supabase. Wait until the status line shows that courses are loaded (or fix env/credentials if you see an error).
+
+2. **Add courses** — In **Add a course**, type a CRN, course title, or section; pick from suggestions if shown. Press **Add** or Enter. Repeat to build your list.
+
+3. **Order matters** — Drag and drop rows in **Selections** to set priority (order affects Webtree layout and schedule ranking).
+
+4. **Build schedules** — Click **Build schedules** to refresh ranked, conflict-aware schedule options from your active selections.
+
+5. **Preview** — Use **Preview schedule** to switch among generated schedules. The **calendar** shows that schedule by day and time.
+
+6. **Webtree** — Scroll to **WebTree Preview** to see Trees 1–4 filled from your selections and the currently selected schedule. Use **Download PDF** to save that preview as a PDF.
+
+7. **Help** — Click **Help** in the header for a short usage summary.
+
+## Project layout
+
+- `src/App.jsx` — Supabase client, catalog load, schedule logic, page shell
+- `src/components/` — UI sections (hero, course input, calendar, schedules, webtree, etc.)
+- `src/lib/` — Pure helpers (`courseUtils.js`, `constants.js`) for matching and schedule generation
+- `index.html` — Vite entry HTML
+- `vite.config.js` — Vite + React plugin
+
+## License
+
+ISC (see `package.json`).

@@ -2,9 +2,11 @@
   "name": "tree-climber",
   "version": "1.0.0",
   "description": "__Group #4__",
-  "main": "app.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -13,14 +15,19 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/laoehler/Tree-Climber/issues"
   },
   "homepage": "https://github.com/laoehler/Tree-Climber#readme",
   "dependencies": {
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "mysql2": "^3.20.0"
+    "@supabase/supabase-js": "^2.49.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.3"
   }
 }
