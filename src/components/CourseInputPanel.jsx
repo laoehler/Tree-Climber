@@ -48,7 +48,7 @@ export function CourseInputPanel({
         </div>
         <div className="status">{status}</div>
         <div className="selections">
-          <h2>Selections - Drag and drop to reorder!</h2>
+          <h2>Selections</h2>
           <SelectionList
             selections={selections}
             selectionMatchesById={selectionMatchesById}

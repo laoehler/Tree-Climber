@@ -1,5 +1,41 @@
 import { getSelectionDisplayCourse } from "../lib/courseUtils.js";
 
+function formatTime(timeStr) {
+  if (!timeStr || typeof timeStr !== "string") return "";
+
+  if (!timeStr.includes("–") && !timeStr.includes("-")) return timeStr;
+
+  const parts = timeStr.split(/–|-/);
+  if (parts.length !== 2) return timeStr;
+
+  const [start, end] = parts.map(t => t.trim());
+
+  function formatOne(t, includeAmPm) {
+    if (!t) return "";
+  
+    let ampm = "";
+    if (t.toLowerCase().includes("am")) ampm = "AM";
+    if (t.toLowerCase().includes("pm")) ampm = "PM";
+  
+    const num = t.replace(/am|pm/i, "").trim();
+  
+    if (num.length !== 4) return t;
+  
+    let hour = num.slice(0, 2);
+    const minute = num.slice(2, 4);
+  
+    hour = String(parseInt(hour, 10));
+  
+    return `${hour}:${minute}${includeAmPm && ampm ? " " + ampm : ""}`;
+  }
+
+  const formattedStart = formatOne(start, false);
+  const formattedEnd = formatOne(end, true);
+
+  return `${formattedStart} – ${formattedEnd}`;
+}
+
+
 export function SelectionList({ selections, selectionMatchesById, onRemoveSelection, onReorderSelections }) {
   if (!selections.length) {
     return <p className="summary">No selections yet.</p>;
@@ -10,6 +46,7 @@ export function SelectionList({ selections, selectionMatchesById, onRemoveSelect
       {selections.map((selection) => {
         const matches = selectionMatchesById.get(selection.id) || [];
         const displayCourse = getSelectionDisplayCourse(matches, selection.course);
+        console.log(displayCourse);
         const countLabel =
           matches.length === 1 ? "1 backend match" : `${matches.length} backend matches`;
 
@@ -43,11 +80,29 @@ export function SelectionList({ selections, selectionMatchesById, onRemoveSelect
             }}
           >
             <div>
-              <strong>{displayCourse?.title || selection.displayTitle || selection.raw}</strong>
-              <span style={{ marginLeft: "8px" }}>
-                {displayCourse?.courseSection || selection.displaySection || selection.raw}
-              </span>
-              <span>{countLabel}</span>
+            <div>
+                <strong>{displayCourse?.title || selection.displayTitle}</strong>
+
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#666",
+                    marginTop: "4px"
+                  }}
+                >
+                  {(() => {
+                    const course = displayCourse || selection.course;
+                    const meeting = course?.meetings?.[0];
+
+                    return (
+                      <>
+                        {course?.courseSection}
+                        {meeting ? ` · ${meeting.days} ${formatTime(meeting.time)}` : ""}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
             </div>
 
             <div className="selection-actions">
