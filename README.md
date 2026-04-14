@@ -17,8 +17,6 @@
 - **Supabase** — course and meeting data loaded from a hosted Supabase project (PostgreSQL + API)
 - **html2canvas** + **jsPDF** — “Download PDF” for the Webtree preview
 
-There is no separate Node/Express server in this repo; the browser talks to Supabase directly using the public (anon) API key pattern.
-
 ## Prerequisites
 
 - **Node.js** 18+ (LTS recommended)
@@ -33,18 +31,6 @@ There is no separate Node/Express server in this repo; the browser talks to Supa
    ```bash
    npm install
    ```
-
-3. **Optional — Supabase configuration**
-
-   The app can read `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from a `.env` or `.env.local` file at the project root (see `.env.example`). If you omit them, built-in defaults in `src/App.jsx` are used so local development still works.
-
-   Copy the example and edit:
-
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Fill in values from your [Supabase project settings](https://supabase.com/dashboard) (URL and anon/public key). Do not commit real keys if your repo is public; keep `.env.local` out of version control (it is listed in `.gitignore`).
 
 ## Commands
 
@@ -77,7 +63,3 @@ There is no separate Node/Express server in this repo; the browser talks to Supa
 - `src/lib/` — Pure helpers (`courseUtils.js`, `constants.js`) for matching and schedule generation
 - `index.html` — Vite entry HTML
 - `vite.config.js` — Vite + React plugin
-
-## License
-
-ISC (see `package.json`).
