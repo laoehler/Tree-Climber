@@ -1,6 +1,10 @@
-export function Hero({ onHelpClick }) {
+import { useState } from "react";
+import { HelpModal } from "./HelpModal";
+
+export function Hero() {
+  const [showHelp, setShowHelp] = useState(false);
   return (
-    <header className="hero">
+    <header className="hero" style={{ position: "relative" }}>
       <div className="hero__badge">Webtree Builder</div>
       <h1>Pick courses. See schedules.</h1>
       <p>
@@ -8,9 +12,19 @@ export function Hero({ onHelpClick }) {
         schedules and receive a recommendation of how to fill out your webtree.
       </p>
       <div style={{ marginTop: 12 }}>
-        <button className="pill" type="button" onClick={onHelpClick}>
-          Help
-        </button>
+        <div style={{ position: "relative", display: "inline-block" }}>
+          <button
+            className="pill"
+            type="button"
+            onClick={() => setShowHelp(!showHelp)}
+          >
+            Help
+          </button>
+
+          {showHelp && (
+            <HelpModal onClose={() => setShowHelp(false)} />
+          )}
+        </div>
       </div>
     </header>
   );

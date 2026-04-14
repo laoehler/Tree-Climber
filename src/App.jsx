@@ -29,7 +29,6 @@ export default function App() {
   const [selectionId, setSelectionId] = useState(0);
   const [selections, setSelections] = useState([]);
   const [selectedScheduleIndex, setSelectedScheduleIndex] = useState(0);
-  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -215,7 +214,7 @@ export default function App() {
   return (
     <>
       <main className="page">
-        <Hero onHelpClick={() => setHelpOpen(true)} />
+        <Hero />
         <CourseInputPanel
           inputValue={inputValue}
           onInputChange={setInputValue}
@@ -237,7 +236,6 @@ export default function App() {
           selectedSchedule={selectedSchedule}
         />
       </main>
-      {helpOpen ? <HelpModal onClose={() => setHelpOpen(false)} /> : null}
     </>
   );
 }

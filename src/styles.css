@@ -978,3 +978,128 @@ button:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+.help-popover {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);        
+  transform: translateY(-50%);
+
+  width: 380px;
+  max-width: calc(100vw - 40px);
+  padding: 16px 18px;
+
+  background: white;
+  border-radius: 14px;
+
+  border: 2px solid black;  
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+
+  z-index: 1000;
+}
+
+.help-popover {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  color: #111;
+}
+
+.help-popover {
+  border-radius: 16px;
+}
+
+.help-popover h3 {
+  margin-top: 0;        
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.help-popover ol {
+  margin: 0;
+  padding-left: 18px;   
+}
+
+.help-popover li {
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.help-close {
+  border: none;
+  background: transparent;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #d32f2f;   
+  cursor: pointer;
+
+  line-height: 1;   
+}
+
+.help-close:hover {
+  background: rgba(0,0,0,0.08);
+}
+
+.help-popover {
+  animation: fadeIn 0.2s ease;
+}
+
+.help-popover {
+  left: calc(100% + 18px);   
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.help-header h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.help-popover::before {
+  content: "";
+  position: absolute;
+
+  left: -12px;        /* 让箭头悬浮出来 */
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 0;
+  height: 0;
+
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 12px solid white;   /* 白色箭头 */
+}
+
+.help-popover::after {
+  content: "";
+  position: absolute;
+
+  left: -14px;       
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 0;
+  height: 0;
+
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-right: 14px solid black; 
+}
