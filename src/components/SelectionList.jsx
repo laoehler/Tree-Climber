@@ -46,14 +46,11 @@ export function SelectionList({ selections, selectionMatchesById, onRemoveSelect
       {selections.map((selection) => {
         const matches = selectionMatchesById.get(selection.id) || [];
         const displayCourse = getSelectionDisplayCourse(matches, selection.course);
-        console.log(displayCourse);
-        const countLabel =
-          matches.length === 1 ? "1 backend match" : `${matches.length} backend matches`;
 
         return (
           <div
             key={selection.id}
-            className="selection-item"
+            className={`selection-item ${!selection.active ? "inactive" : ""}`}
             draggable
             onDragStart={(event) => {
               event.dataTransfer.setData("text/plain", String(selection.id));
@@ -80,17 +77,19 @@ export function SelectionList({ selections, selectionMatchesById, onRemoveSelect
             }}
           >
             <div>
-            <div>
-                <strong>{displayCourse?.title || selection.displayTitle}</strong>
+              <strong>{displayCourse?.title || selection.displayTitle}</strong>
 
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginTop: "4px"
-                  }}
-                >
-                  {(() => {
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#666",
+                  marginTop: "4px"
+                }}
+              >
+                {!selection.active ? (
+                  "Hidden from schedule."
+                ) : (
+                  (() => {
                     const course = displayCourse || selection.course;
                     const meeting = course?.meetings?.[0];
 
@@ -100,18 +99,31 @@ export function SelectionList({ selections, selectionMatchesById, onRemoveSelect
                         {meeting ? ` · ${meeting.days} ${formatTime(meeting.time)}` : ""}
                       </>
                     );
-                  })()}
-                </div>
+                  })()
+                )}
               </div>
             </div>
 
             <div className="selection-actions">
               <button
                 type="button"
-                className="pill"
+                className={`pill ${!!selection.active ? "active" : ""}`}
+                onClick={() => {
+                  const updated = selections.map((s) =>
+                    s.id === selection.id ? { ...s, active: !s.active } : s
+                  );
+                  onReorderSelections(updated);
+                }}
+              >
+                {selection.active ? "Hide" : "Show"}
+              </button>
+
+              <button
+                type="button"
+                className="pill delete"
                 onClick={() => onRemoveSelection(selection.id)}
               >
-                Remove
+                Delete
               </button>
             </div>
           </div>

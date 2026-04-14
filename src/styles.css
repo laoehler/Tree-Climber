@@ -229,6 +229,17 @@ button:focus-visible {
   justify-content: flex-end;
 }
 
+.selection-item.inactive {
+  background: #f0ece6;
+  opacity: 0.6;
+}
+
+.pill.delete {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
 .pill {
   border: 1px solid var(--border);
   background: #ffffff;
@@ -240,21 +251,30 @@ button:focus-visible {
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-/* SHOW button hover */
+.pill {
+  background: #ffffff;
+  color: var(--ink);       
+  border: 1px solid var(--border);
+}
+
+.pill:hover {
+  border-color: var(--accent);
+  background: #f9f6f1;
+}
+
+.pill.delete {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
 .pill:hover {
   border-color: var(--accent);
   background: #ffe6ea;
   color: #7a0019;
 }
 
-/* HIDE button default (active state) */
-.pill.active {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
 
-/* HIDE button hover */
+
 .pill.active:hover {
   background: #a30d25;
   border-color: #a30d25;
