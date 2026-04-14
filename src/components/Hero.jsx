@@ -5,7 +5,7 @@ export function Hero() {
   const [showHelp, setShowHelp] = useState(false);
   return (
     <header className="hero" style={{ position: "relative" }}>
-      <div className="hero__badge">Webtree Builder</div>
+      <div className="hero__badge">Tree Climber</div>
       <h1>Pick courses. See schedules.</h1>
       <p>
         Enter a CRN, course title, or course section. Add multiple selections to explore possible 4-course
