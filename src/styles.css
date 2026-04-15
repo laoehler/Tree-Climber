@@ -48,13 +48,16 @@ body {
 
 .hero__badge {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
+  padding: 14px 28px;
+  border-radius: 12px;
   background: var(--accent);
   color: #fff;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 45px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  margin-bottom: 12px;
+  line-height: 1;
 }
 
 .hero h1 {
