@@ -34,7 +34,7 @@ function mergeMeetings(meetings) {
   return merged;
 }
 
-export function Calendar({ schedule }) {
+export function Calendar({ schedule, selections = [] }) {
   return (
     <div className="calendar">
       <CalendarTimes />
@@ -50,6 +50,28 @@ export function Calendar({ schedule }) {
           );
 
           const mergedMeetings = mergeMeetings(dayMeetings);
+
+          // Build a list of meetings coming from the user's selection list for this day
+          const selectionMeetings = selections.flatMap((selection) =>
+            (selection.course?.meetings || [])
+              .filter((m) => expandDays(m.days).includes(day))
+              .map((m) => ({ ...m, course: selection.course }))
+          );
+
+          // For each merged meeting, determine if it conflicts with any selection meeting
+          mergedMeetings.forEach((meeting) => {
+            const conflicts = selectionMeetings.filter((sel) => {
+              // skip if same course is part of this merged meeting
+              if (meeting.courses && meeting.courses.some((c) => c.crn === sel.course?.crn)) return false;
+
+              if (!meeting.range || !sel.range) return false;
+
+              return meeting.range.start < sel.range.end && sel.range.start < meeting.range.end;
+            });
+
+            meeting.conflictingSelections = conflicts.map((c) => c.course).filter(Boolean);
+            meeting.conflictWithSelections = meeting.conflictingSelections.length > 0;
+          });
 
           return (
             <div key={day} className="calendar__column">

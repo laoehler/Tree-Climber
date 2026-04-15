@@ -6,7 +6,8 @@ export function SchedulesSection({
   selectedScheduleIndex,
   onSelectSchedule,
   summary,
-  selectedSchedule
+  selectedSchedule,
+  selections
 }) {
   return (
     <section className="results">
@@ -33,7 +34,7 @@ export function SchedulesSection({
         </div>
         <div className="summary">{summary}</div>
       </div>
-      <Calendar schedule={selectedSchedule} />
+      <Calendar schedule={selectedSchedule} selections={selections} />
       <div className="schedules">
         {schedules.length ? (
           schedules.map((schedule, index) => (

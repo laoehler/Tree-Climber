@@ -234,6 +234,7 @@ export default function App() {
           onSelectSchedule={setSelectedScheduleIndex}
           summary={scheduleSummary}
           selectedSchedule={selectedSchedule}
+          selections={selections}
         />
       </main>
     </>

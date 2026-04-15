@@ -14,7 +14,7 @@ export function CalendarEvent({ course, meeting }) {
     };
   }
 
-  if (meeting.courses && meeting.courses.length > 1) {
+  if ((meeting.courses && meeting.courses.length > 1) || meeting.conflictWithSelections) {
     const short = (cs) =>
       String(cs)
         .split(":")[0]
@@ -22,10 +22,15 @@ export function CalendarEvent({ course, meeting }) {
         .slice(0, 2)
         .join(" ");
 
+    // Decide which courses to list: merged overlapping courses or conflicting selections
+    const items = meeting.courses && meeting.courses.length > 1
+      ? meeting.courses
+      : meeting.conflictingSelections || [];
+
     return (
       <div className="event conflict" style={style}>
         <div style={{ fontWeight: "bold", color: "var(--accent)" }}>⚠️ Overlap ⚠️</div>
-        {meeting.courses.map((c) => (
+        {items.map((c) => (
           <div key={c.crn}>{short(c.courseSection)}</div>
         ))}
       </div>
