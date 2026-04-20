@@ -237,7 +237,7 @@ const buildTrees = (selections, schedule, selectionMatchesById) => {
     tree("Tree 1", 0, 7),
     tree("Tree 2", 1, 7),
     tree("Tree 3", 2, 7),
-    tree("Tree 4", 0, 10)
+    tree("Tree 4", 3, 10)
   ];
 };
 
