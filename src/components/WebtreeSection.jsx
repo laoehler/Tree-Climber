@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import { formatMeetingLabel } from "../lib/courseUtils.js";
+import { formatMeetingLabel } from "../lib/index.js";
 
 function handleDownloadPDF() {
   const element = document.querySelector(".webtree-preview-vertical");

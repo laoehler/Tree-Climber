@@ -1,5 +1,5 @@
 import { CALENDAR_BODY_HEIGHT, DAY_HEADER_HEIGHT, DAY_LABELS, DAYS } from "../lib/constants.js";
-import { expandDays } from "../lib/courseUtils.js";
+import { expandDays } from "../lib/index.js";
 import { CalendarEvent } from "./CalendarEvent.jsx";
 import { CalendarTimes } from "./CalendarTimes.jsx";
 
