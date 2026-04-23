@@ -1,26 +1,16 @@
-import { createClient } from "@supabase/supabase-js";
 import { useEffect, useMemo, useState } from "react";
 import {
-  buildCourseSearchBlob,
   buildRankedSchedules,
   buildTrees,
   getSelectionMatches,
-  normalize,
-  parseTimeRange
-} from "./lib/courseUtils.js";
+  normalize
+} from "./lib/index.js";
 import { CourseInputPanel } from "./components/CourseInputPanel.jsx";
 import { HelpModal } from "./components/HelpModal.jsx";
 import { Hero } from "./components/Hero.jsx";
 import { SchedulesSection } from "./components/SchedulesSection.jsx";
 import { WebtreeSection } from "./components/WebtreeSection.jsx";
-
-const supabaseUrl =
-  import.meta.env.VITE_SUPABASE_URL ?? "https://csotlkemhfrucmubopsr.supabase.co";
-const supabaseAnonKey =
-  import.meta.env.VITE_SUPABASE_ANON_KEY ??
-  "sb_publishable_k25RlLfIDRTbeQrncvPopw_hB68GuIS";
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { loadCatalog } from "./services/catalog.js";
 
 export default function App() {
   const [catalog, setCatalog] = useState([]);
@@ -34,19 +24,7 @@ export default function App() {
     let active = true;
 
     const loadCourses = async () => {
-      const { data, error } = await supabase.from("course").select(`
-          crn,
-          course_code,
-          course_title,
-          department,
-          meeting:meeting (
-            weekdays,
-            class_time,
-            start_time,
-            end_time,
-            room
-          )
-        `);
+      const { catalog: nextCatalog, error } = await loadCatalog();
 
       if (!active) return;
 
@@ -54,28 +32,6 @@ export default function App() {
         setStatus(error.message);
         return;
       }
-
-      const nextCatalog = (data || []).map((course) => {
-        const meetings = (course.meeting || []).map((meeting) => ({
-          days: meeting.weekdays || "TBA",
-          time: meeting.class_time || "TBA",
-          room: meeting.room || "",
-          range: parseTimeRange(meeting.class_time, meeting.start_time, meeting.end_time)
-        }));
-
-        const normalizedCourse = {
-          crn: String(course.crn || ""),
-          courseSection: course.course_code || "",
-          title: course.course_title || "Untitled course",
-          department: course.department || "",
-          meetings
-        };
-
-        return {
-          ...normalizedCourse,
-          searchBlob: buildCourseSearchBlob(normalizedCourse)
-        };
-      });
 
       setCatalog(nextCatalog);
       setStatus(`Loaded ${nextCatalog.length} courses from the backend.`);

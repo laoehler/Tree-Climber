@@ -32,6 +32,8 @@
    npm install
    ```
 
+3. Optional: copy `.env.example` to `.env.local` and provide Supabase credentials if you do not want to use the default hosted values.
+
 ## Commands
 
 | Command           | Description                                      |
@@ -58,8 +60,24 @@
 
 ## Project layout
 
-- `src/App.jsx` — Supabase client, catalog load, schedule logic, page shell
-- `src/components/` — UI sections (hero, course input, calendar, schedules, webtree, etc.)
-- `src/lib/` — Pure helpers (`courseUtils.js`, `constants.js`) for matching and schedule generation
+The repository contains one frontend application and a small set of supporting data-prep artifacts. The production backend is a hosted Supabase project, so there is no local server directory in this repo.
+
+- `src/App.jsx` — top-level application state and page composition
+- `src/components/` — presentational React components for input, schedule preview, calendar, and Webtree output
+- `src/services/catalog.js` — backend-facing catalog loader and response normalization
+- `src/lib/constants.js` — shared UI and scheduling constants
+- `src/lib/text.js` — string normalization helpers
+- `src/lib/time.js` — time parsing and display formatting helpers
+- `src/lib/courseSearch.js` — catalog search indexing and selection matching
+- `src/lib/coursePresentation.js` — shared course and meeting display labels
+- `src/lib/scheduling.js` — conflict detection, schedule ranking, and calendar placement logic
+- `src/lib/webtree.js` — Webtree-specific selection resolution and tree generation
+- `docs/data-prep/` — notebook and CSV assets used during data preparation, kept separate from app runtime code
 - `index.html` — Vite entry HTML
-- `vite.config.js` — Vite + React plugin
+- `vite.config.js` — Vite + React plugin configuration
+
+## Maintenance notes
+
+- Shared logic is separated by concern so utility modules stay cohesive and easier to test.
+- JSDoc comments are included on exported helpers and service functions to make intent easier to scan in-editor.
+- Generated artifacts such as `dist/`, Vite cache files, and notebook checkpoints are ignored in Git.

@@ -1,40 +1,4 @@
-import { getSelectionDisplayCourse } from "../lib/courseUtils.js";
-
-function formatTime(timeStr) {
-  if (!timeStr || typeof timeStr !== "string") return "";
-
-  if (!timeStr.includes("–") && !timeStr.includes("-")) return timeStr;
-
-  const parts = timeStr.split(/–|-/);
-  if (parts.length !== 2) return timeStr;
-
-  const [start, end] = parts.map(t => t.trim());
-
-  function formatOne(t, includeAmPm) {
-    if (!t) return "";
-  
-    let ampm = "";
-    if (t.toLowerCase().includes("am")) ampm = "AM";
-    if (t.toLowerCase().includes("pm")) ampm = "PM";
-  
-    const num = t.replace(/am|pm/i, "").trim();
-  
-    if (num.length !== 4) return t;
-  
-    let hour = num.slice(0, 2);
-    const minute = num.slice(2, 4);
-  
-    hour = String(parseInt(hour, 10));
-  
-    return `${hour}:${minute}${includeAmPm && ampm ? " " + ampm : ""}`;
-  }
-
-  const formattedStart = formatOne(start, false);
-  const formattedEnd = formatOne(end, true);
-
-  return `${formattedStart} – ${formattedEnd}`;
-}
-
+import { formatDisplayTime, getSelectionDisplayCourse } from "../lib/index.js";
 
 export function SelectionList({ selections, selectionMatchesById, onRemoveSelection, onReorderSelections }) {
   if (!selections.length) {
@@ -96,7 +60,7 @@ export function SelectionList({ selections, selectionMatchesById, onRemoveSelect
                     return (
                       <>
                         {course?.courseSection}
-                        {meeting ? ` · ${meeting.days} ${formatTime(meeting.time)}` : ""}
+                        {meeting ? ` · ${meeting.days} ${formatDisplayTime(meeting.time)}` : ""}
                       </>
                     );
                   })()

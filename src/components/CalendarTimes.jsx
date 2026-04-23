@@ -5,7 +5,7 @@ import {
   DAY_HEADER_HEIGHT,
   HOUR_ROW_HEIGHT
 } from "../lib/constants.js";
-import { formatMinutes } from "../lib/courseUtils.js";
+import { formatMinutes } from "../lib/index.js";
 
 export function CalendarTimes() {
   const labels = [

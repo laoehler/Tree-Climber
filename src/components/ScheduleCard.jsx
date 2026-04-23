@@ -1,4 +1,4 @@
-import { formatMeetingLabel } from "../lib/courseUtils.js";
+import { formatMeetingLabel } from "../lib/index.js";
 
 export function ScheduleCard({ schedule, index }) {
   const countLabel = schedule.length === 1 ? "1 course" : `${schedule.length} courses`;

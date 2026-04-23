@@ -2,7 +2,7 @@ import {
   buildCalendarEventStyle,
   buildCourseLabel,
   formatMeetingLabel
-} from "../lib/courseUtils.js";
+} from "../lib/index.js";
 
 export function CalendarEvent({ course, meeting }) {
   let style = buildCalendarEventStyle(meeting);
