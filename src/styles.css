@@ -243,6 +243,10 @@ button:focus-visible {
   border-color: var(--accent);
 }
 
+.pill.delete:hover {
+  background: #e0193b;   
+}
+
 .pill {
   border: 1px solid var(--border);
   background: #ffffff;
@@ -272,16 +276,13 @@ button:focus-visible {
 }
 .pill:hover {
   border-color: var(--accent);
-  background: #ffe6ea;
-  color: #7a0019;
+  background: #f9f6f1;
 }
 
 
-
 .pill.active:hover {
-  background: #a30d25;
-  border-color: #a30d25;
-  color: #ffffff;
+  border-color: var(--accent);
+  background: #f9f6f1;
 }
 
 .match-list {

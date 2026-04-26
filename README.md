@@ -11,6 +11,16 @@
 - Ross Hope — Developer and Scrum Master
 - Samantha Galvan — Developer
 
+## Problem and motivation
+
+Davidson’s Webtree system requires students to translate a normal ranked course list into four preference trees. This process can be confusing because students often need to compare the course catalog, DegreeWorks, schedule conflicts, and Webtree rules at the same time.
+
+Tree Climber is designed as a helper tool for this workflow. Instead of asking students to manually reason through every possible schedule conflict and tree placement, the app lets users search for courses, rank their preferences, preview possible schedules, and see a Webtree-style output that can guide their final registration choices.
+
+The main user story is:
+
+> As a student planning registration, I want to enter and reorder the courses I am interested in so that I can quickly see possible schedules and understand how my preferences might translate into Webtree-style trees.
+
 ## Tech stack
 
 - **React 18** with **Vite** (dev server, hot reload, production builds)
@@ -81,3 +91,10 @@ The repository contains one frontend application and a small set of supporting d
 - Shared logic is separated by concern so utility modules stay cohesive and easier to test.
 - JSDoc comments are included on exported helpers and service functions to make intent easier to scan in-editor.
 - Generated artifacts such as `dist/`, Vite cache files, and notebook checkpoints are ignored in Git.
+
+## Known limitations and future work
+
+- The app currently depends on the course data available in the connected Supabase project, so missing or outdated catalog data may affect search results and schedule generation.
+- The calendar preview focuses on the first four active selections, while later selections may still be used to warn users about potential time conflicts.
+- Future improvements could include clearer backend documentation, automated tests for schedule generation, and more detailed onboarding examples for first-time Webtree users.
+- A longer-term improvement would be to further separate frontend UI logic, data loading, and scheduling logic so that each part of the project is easier to maintain and test.
