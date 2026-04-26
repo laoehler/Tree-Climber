@@ -35,12 +35,17 @@ function mergeMeetings(meetings) {
 }
 
 export function Calendar({ schedule, selections = [] }) {
+  const displaySchedule = selections
+  .filter((selection) => selection.active !== false)
+  .slice(0, 4)
+  .map((selection) => selection.course)
+  .filter(Boolean);
   return (
     <div className="calendar">
       <CalendarTimes />
       <div className="calendar__grid">
         {DAYS.map((day) => {
-          const dayMeetings = schedule.flatMap((course) =>
+          const dayMeetings = displaySchedule.flatMap((course) =>
             course.meetings
               .filter((meeting) => expandDays(meeting.days).includes(day))
               .map((meeting) => ({
