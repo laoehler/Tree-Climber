@@ -25,7 +25,10 @@ export function CalendarEvent({ course, meeting }) {
     // Decide which courses to list: merged overlapping courses or conflicting selections
     const items = meeting.courses && meeting.courses.length > 1
       ? meeting.courses
-      : meeting.conflictingSelections || [];
+      : [
+          ...(meeting.courses || []),
+          ...(meeting.conflictingSelections || [])
+        ];
 
     return (
       <div className="event conflict" style={style}>

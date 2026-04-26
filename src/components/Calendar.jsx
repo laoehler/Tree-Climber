@@ -57,7 +57,9 @@ export function Calendar({ schedule, selections = [] }) {
           const mergedMeetings = mergeMeetings(dayMeetings);
 
           // Build a list of meetings coming from the user's selection list for this day
-          const selectionMeetings = selections.flatMap((selection) =>
+          const selectionMeetings = selections
+          .filter((selection) => selection.active !== false)
+          .flatMap((selection) =>
             (selection.course?.meetings || [])
               .filter((m) => expandDays(m.days).includes(day))
               .map((m) => ({ ...m, course: selection.course }))

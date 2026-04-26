@@ -9,6 +9,11 @@ export function SchedulesSection({
   selectedSchedule,
   selections
 }) {
+  const displaySchedule = selections
+  .filter((selection) => selection.active !== false)
+  .slice(0, 4)
+  .map((selection) => selection.course)
+  .filter(Boolean);
   return (
     <section className="results">
       <div className="results__header">
@@ -38,7 +43,7 @@ export function SchedulesSection({
       <div className="schedules">
         {schedules.length ? (
           schedules.map((schedule, index) => (
-            <ScheduleCard key={index} schedule={schedule} index={index} />
+            <ScheduleCard key={index} schedule={displaySchedule} index={index} />
           ))
         ) : (
           <p className="summary">No conflict-free schedules matched your selections.</p>
