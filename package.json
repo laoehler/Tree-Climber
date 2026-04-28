@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/laoehler/Tree-Climber/issues"
   },
-  "homepage": "https://github.com/laoehler/Tree-Climber#readme",
+  "homepage": "https://laoehler.github.io/Tree-Climber/",
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
     "html2canvas": "^1.4.1",
