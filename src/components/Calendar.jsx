@@ -59,6 +59,7 @@ export function Calendar({ schedule, selections = [] }) {
           // Build a list of meetings coming from the user's selection list for this day
           const selectionMeetings = selections
           .filter((selection) => selection.active !== false)
+          .slice(0, 4)
           .flatMap((selection) =>
             (selection.course?.meetings || [])
               .filter((m) => expandDays(m.days).includes(day))
